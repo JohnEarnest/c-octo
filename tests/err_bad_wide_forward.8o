@@ -1,0 +1,5 @@
+: main
+i := target
+# this resolution won't fit in the 12-bit instruction above
+:org 0x2000
+: target

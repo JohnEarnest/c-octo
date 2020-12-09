@@ -1,0 +1,1 @@
+:assert "universe failure" { 2 == 3 }

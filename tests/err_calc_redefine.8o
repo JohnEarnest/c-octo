@@ -1,0 +1,4 @@
+:calc foo { 2 }
+:calc foo { 1 + foo } # this is fine
+:const baz 23
+:calc baz { baz + foo } # this is not!

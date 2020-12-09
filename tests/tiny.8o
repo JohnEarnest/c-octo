@@ -1,0 +1,6 @@
+
+# a line comment
+
+: main
+	va := 0xBC
+	loop again

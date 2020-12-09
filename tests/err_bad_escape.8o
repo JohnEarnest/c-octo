@@ -1,0 +1,2 @@
+: main
+	"a string with a bogus \x escape sequence."

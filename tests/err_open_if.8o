@@ -1,0 +1,8 @@
+: main
+
+if v0 == 1 begin
+	if v2 == 3 begin
+		v3 := 4
+	else
+		v5 := 9
+	v6 := 12

@@ -1,0 +1,3 @@
+:macro foo { 23 }
+:macro foo { 0xAB 0xCD }
+foo

@@ -1,0 +1,2 @@
+if v0 == 1 then v2 := 3
+else v2 := 1

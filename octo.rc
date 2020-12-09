@@ -1,0 +1,39 @@
+
+# c-octo configuration
+# shared by octo-run and octo-de
+
+ui.windowed=1
+ui.software_render=0
+ui.win_scale=2
+ui.win_width=480
+ui.win_height=272
+
+# volume ranges between 0 and 127:
+ui.volume=4
+
+core.tickrate=500
+core.max_rom=65024
+
+# rotations: 0, 90, 180, 270
+core.rotation=0
+
+# fonts: octo, vip, dream_6800, eti_660, schip, fish
+core.font=octo
+
+# touch modes: none, swipe, seg16, seg16_fill, gamepad, vip
+core.touch_mode=none
+
+# all colors are hex RGB
+color.plane0=996600
+color.plane1=FFCC00
+color.plane2=FF6600
+color.plane3=662200
+color.background=000000
+color.sound=FFAA00
+
+quirks.shift=0
+quirks.loadstore=0
+quirks.jump0=0
+quirks.logic=0
+quirks.clip=0
+quirks.vblank=0

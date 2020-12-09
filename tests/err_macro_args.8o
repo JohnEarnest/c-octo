@@ -1,0 +1,2 @@
+:macro foo A B { :byte A :byte B }
+foo 23

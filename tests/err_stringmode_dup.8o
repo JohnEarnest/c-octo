@@ -1,0 +1,3 @@
+:stringmode foo "abc" { :byte 10 }
+:stringmode foo "ebg" { :byte 20 }
+foo "abcg"

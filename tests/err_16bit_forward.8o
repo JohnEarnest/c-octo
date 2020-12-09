@@ -1,0 +1,5 @@
+
+: main
+	i := forward
+	:monitor forward 10
+: forward

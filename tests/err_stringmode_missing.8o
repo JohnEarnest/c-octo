@@ -1,0 +1,2 @@
+:stringmode foo "ABC" { :byte { VALUE * 5 } }
+foo "ABBABCDA"

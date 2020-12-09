@@ -1,0 +1,4 @@
+: main
+i := forward
+:const name forward
+: forward

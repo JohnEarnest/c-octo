@@ -1,0 +1,2 @@
+if v0 == 1 begin v2 := 3 end
+end v2 := 1

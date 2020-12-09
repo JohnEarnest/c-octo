@@ -1,0 +1,7 @@
+: main
+	loop
+			loop
+			loop
+				v0 := 1
+			again
+			v1 := 2
