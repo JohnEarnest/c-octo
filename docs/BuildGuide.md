@@ -29,7 +29,7 @@ make
 ```
 You'll probably want to create a `.octo.rc` in your MinGW home directory and tweak the settings:
 ```
-cp octo.rc ~/.octo.rc`
+cp octo.rc ~/.octo.rc
 ```
 
 Windows (MSVC)
@@ -37,8 +37,8 @@ Windows (MSVC)
 Install SDL2 somewhere convenient, and create a project which links against and includes it appropriately:
 
 - Project -> Properties -> Configuration Properties -> VC++ Directories -> Include Directories -> Edit -> add the path to the `include`s.
-- Project -> Properties -> Configuration Properties -> VC++ Directories -> Include Directories -> Edit -> add the path to the `libs`.
-- Project -> Properties -> Configuration Propertoes -> C/C++ -> Preprocessor -> add `_CRT_SECURE_NO_WARNINGS;` to suppress complaints about using `fopen()`.
+- Project -> Properties -> Configuration Properties -> VC++ Directories -> Library Directories -> Edit -> add the path to the `libs`.
+- Project -> Properties -> Configuration Properties -> C/C++ -> Preprocessor -> add `_CRT_SECURE_NO_WARNINGS;` to suppress complaints about using `fopen()`.
 - Project -> Properties -> Linker -> Input -> Additional Dependencies -> Edit -> add `SDL2.lib; SDL2main.lib;`.
 - Project -> Properties -> Linker -> System -> SubSystem -> make sure it is `Windows (/SUBSYSTEM:WINDOWS)`.
 - Add files from `c-octo/src/`:
