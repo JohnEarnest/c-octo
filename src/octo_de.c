@@ -1449,7 +1449,7 @@ int main(int argc,char*argv[]){
   state.open_scroll=0;
   state.open_sel=0;
   state.open_drag=0;
-  snprintf(state.open_name,sizeof(state.open_name),"");
+  snprintf(state.open_name,sizeof(state.open_name),"%s","");
   state.mode=MODE_TEXT_EDITOR;
   state.dirty=0;
 

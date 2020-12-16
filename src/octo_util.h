@@ -346,7 +346,7 @@ void draw_rrect(rect*r,int color){
 void string_cap_left(char*dest,char*src,int max){
   int len=strlen(src);
   if(len<max)snprintf(dest,max,"%s",src);
-  else snprintf(dest,max-4,"%s",src),snprintf(dest+max-5,4,"..."); // foo...
+  else {snprintf(dest,max-4,"%s",src);snprintf(dest+max-5,4,"...");} // foo...
 }
 void string_cap_right(char*dest,char*src,int max){
   int len=strlen(src);

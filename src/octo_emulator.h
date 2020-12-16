@@ -463,5 +463,5 @@ void octo_emulator_instruction(octo_emulator*e){
     case 0xF: octo_emulator_misc(e,x,nn);                        break;
     default: e->halt=1, snprintf(e->halt_message,OCTO_HALT_MAX,"Unknown Opcode 0x%0X",op);  
   }
-  if(e->rp>12)e->halt=1,snprintf(e->halt_message,OCTO_HALT_MAX,"Call Stack Overflow");
+  if(e->rp>12){e->halt=1;snprintf(e->halt_message,OCTO_HALT_MAX,"Call Stack Overflow");}
 }
