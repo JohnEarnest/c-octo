@@ -759,7 +759,11 @@ void octo_resolve_label(octo_program*p,int offset){
   octo_proto*pr=octo_map_remove(&p->protos,n);
   for(int z=0;z<pr->addrs.count;z++){
     octo_pref*pa=octo_list_get(&pr->addrs,z);
-    if(pa->is_long){// i := long target
+    if(pa->is_long&&(p->rom[pa->value]&0xF0)==0x60){// :unpack long target
+      p->rom[pa->value+1]=target>>8;
+      p->rom[pa->value+3]=target;
+    }
+    else if(pa->is_long){// i := long target
       p->rom[pa->value  ]=target>>8;
       p->rom[pa->value+1]=target;
     }
@@ -815,10 +819,12 @@ void octo_compile_statement(octo_program*p){
   if(octo_match(p,":"))octo_resolve_label(p,0);
   else if(octo_match(p,":next"))octo_resolve_label(p,1);
   else if(octo_match(p,":unpack")){
-    int v=octo_value_4bit(p), a=octo_value_12bit(p);
+    int a=0;
+    if(octo_match(p,"long")){a=octo_value_16bit(p,1,0);}
+    else{int v=octo_value_4bit(p);a=(v<<12)|octo_value_12bit(p);}
     octo_reg*rh=octo_map_get(&p->aliases,octo_intern(p,"unpack-hi"));
     octo_reg*rl=octo_map_get(&p->aliases,octo_intern(p,"unpack-lo"));
-    octo_instruction(p, 0x60|rh->value, (v<<4)|(a>>8));
+    octo_instruction(p, 0x60|rh->value, a>>8);
     octo_instruction(p, 0x60|rl->value, a);
   }
   else if(octo_match(p,":breakpoint")) p->breakpoints[p->here]=octo_string(p);
