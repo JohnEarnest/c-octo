@@ -1,0 +1,15 @@
+
+# :pointer tests
+
+: before
+	0xAA 0xBB
+
+: main
+	:pointer before
+	:pointer after
+	:const bigval 0x4321
+	:pointer bigval
+	:pointer { 0xAB00 | 0xEF }
+
+: after
+	0xCC 0xDD

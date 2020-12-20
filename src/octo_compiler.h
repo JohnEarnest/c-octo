@@ -415,7 +415,7 @@ char* octo_reserved_words[]={
   "save","load","buzzer","if","then","begin","else","end","jump","jump0",
   "native","sprite","loop","while","again","scroll-down","scroll-up","scroll-right","scroll-left",
   "lores","hires","loadflags","saveflags","i","audio","plane",":macro",":calc",":byte",
-  ":call",":stringmode",":assert",":monitor",
+  ":call",":stringmode",":assert",":monitor",":pointer",
 };
 int octo_is_reserved(char*name){
   for(size_t z=0;z<sizeof(octo_reserved_words)/sizeof(char*);z++)if(strcmp(name,octo_reserved_words[z])==0)return 1;
@@ -865,6 +865,10 @@ void octo_compile_statement(octo_program*p){
   }
   else if(octo_match(p,":byte")){
     octo_append(p, octo_peek_match(p,"{",0)?octo_calculated(p,"ANONYMOUS"):octo_value_8bit(p));
+  }
+  else if(octo_match(p,":pointer")){
+    int a=octo_peek_match(p,"{",0)?octo_calculated(p,"ANONYMOUS"):octo_value_16bit(p,1,0);
+    octo_instruction(p,a>>8,a);
   }
   else if(octo_match(p,":org")){
     p->here=(octo_peek_match(p,"{",0)?0xFFFF&(int)octo_calculated(p,"ANONYMOUS"):octo_value_16bit(p,0,0));
