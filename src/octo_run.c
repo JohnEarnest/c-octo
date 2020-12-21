@@ -89,8 +89,6 @@ int main(int argc, char* argv[]){
         overlay=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,(dw/ui.win_scale),(dh/ui.win_scale));
       }
       octo_ui_run(&emu,prog,&ui,win,ren,screen,overlay);
-
-      SDL_RenderPresent(ren);
     }
   }
   SDL_Quit();

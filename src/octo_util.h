@@ -741,15 +741,17 @@ void octo_ui_run(octo_emulator*emu,octo_program*prog,octo_ui_config*ui,SDL_Windo
   SDL_Rect s_dst={(dw-scale*w)/2,(dh-scale*h)/2,scale*w,scale*h};
   SDL_RenderCopy(ren,screen,&s_src,&s_dst);
   //render ui overlays
-  SDL_LockTexture(overlay,NULL,(void**)&p,&pitch);
-  stride=pitch/sizeof(int);
-  octo_ui_begin(&emu->options,p,stride,(dw/ui->win_scale),(dh/ui->win_scale),ui->win_scale);
-  memset(target,0xFF000000,sizeof(int)*stride*th);
-  if(emu->halt)octo_ui_registers(emu,prog);
-  if(ui->show_monitors)octo_ui_monitors(emu,prog);
-  SDL_UnlockTexture(overlay);
-  SDL_SetTextureBlendMode(overlay,SDL_BLENDMODE_BLEND);
-  SDL_RenderCopy(ren,overlay,NULL,NULL);
+  if(emu->halt||ui->show_monitors){
+    SDL_LockTexture(overlay,NULL,(void**)&p,&pitch);
+    stride=pitch/sizeof(int);
+    octo_ui_begin(&emu->options,p,stride,(dw/ui->win_scale),(dh/ui->win_scale),ui->win_scale);
+    memset(p,0,sizeof(int)*stride*th);
+    if(emu->halt)octo_ui_registers(emu,prog);
+    if(ui->show_monitors)octo_ui_monitors(emu,prog);
+    SDL_UnlockTexture(overlay);
+    SDL_SetTextureBlendMode(overlay,SDL_BLENDMODE_BLEND);
+    SDL_RenderCopy(ren,overlay,NULL,NULL);
+  }
   SDL_RenderPresent(ren);
 }
 
