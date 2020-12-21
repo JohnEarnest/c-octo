@@ -94,9 +94,9 @@ sudo yum install -y --nogpgcheck http://download1.rpmfusion.org/free/fedora/rpmf
 sudo yum install -y gcc-c++ make
 ```
 
-On the OLPCs, SDL2 must be built [from source](https://www.libsdl.org/download-2.0.php). Experimentally, I found that v2.0.2 builds on these machines, and is sufficiently new for `octode`. SDL2 needs some X11 development libraries present to be able to actually initialize a video driver:
+On the OLPCs, SDL2 must be built [from source](https://www.libsdl.org/download-2.0.php). Experimentally, I found that v2.0.2 builds on these machines, and is sufficiently new for `octode`. SDL2 needs some [X11](https://en.wikipedia.org/wiki/X_Window_System) development libraries present to be able to actually initialize a video driver. For audio support, we also need [ALSA](https://en.wikipedia.org/wiki/Advanced_Linux_Sound_Architecture) development libraries:
 ```
-sudo yum -y install libX11-devel libXext-devel
+sudo yum -y install libX11-devel libXext-devel alsa-lib-devel
 cd ~
 mkdir sdl2
 cd sdl2
@@ -130,4 +130,6 @@ ui.windowed=1
 ui.software_render=1
 ui.win_scale=1
 ```
-At time of writing, running in fullscreen mode or scaling the UI on the OLPC degrades performance noticeably, especially with the monitor panel open. If you have an OLPC and would like to do some experiments to improve this, suggestions are welcome!
+At time of writing, running in fullscreen mode or scaling the UI on the OLPC degrades performance noticeably, especially with the monitor panel open. If Octo runs slowly you may get `(snd_pcm_recover) underrun occurred` warnings at the console- these are harmless, but can be annoying. Setting `ui.volume=0` will disable audio entirely.
+
+If you have an OLPC and would like to do some experiments to improve this, suggestions are welcome!
