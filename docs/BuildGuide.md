@@ -121,4 +121,4 @@ ui.windowed=1
 ui.software_render=1
 ui.win_scale=1
 ```
-At time of writing, running in fullscreen mode or scaling the UI on the OLPC degrades performance to an unusable level. If you have an OLPC and would like to do some experiments to improve this, suggestions are welcome!
+At time of writing, running in fullscreen mode or scaling the UI on the OLPC degrades performance noticeably, especially with the monitor panel open. If you have an OLPC and would like to do some experiments to improve this, suggestions are welcome!

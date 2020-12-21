@@ -724,6 +724,12 @@ void octo_ui_monitors(octo_emulator*emu,octo_program*prog){
 }
 
 void octo_ui_run(octo_emulator*emu,octo_program*prog,octo_ui_config*ui,SDL_Window*win,SDL_Renderer*ren,SDL_Texture*screen,SDL_Texture*overlay){
+  // drop repaints if the display hasn't changed
+  int dirty=0, debug=emu->halt||ui->show_monitors;
+  for(size_t z=0;z<sizeof(emu->px);z++)if(emu->px[z]!=emu->ppx[z]){dirty=1;break;}
+  if(!dirty&&!debug)return;
+  memcpy(emu->ppx,emu->px,sizeof(emu->ppx));
+
   // render chip8 display
   int *p, pitch, w=emu->hires?128:64, h=emu->hires?64:32;
   SDL_LockTexture(screen,NULL,(void**)&p,&pitch);
@@ -741,7 +747,7 @@ void octo_ui_run(octo_emulator*emu,octo_program*prog,octo_ui_config*ui,SDL_Windo
   SDL_Rect s_dst={(dw-scale*w)/2,(dh-scale*h)/2,scale*w,scale*h};
   SDL_RenderCopy(ren,screen,&s_src,&s_dst);
   //render ui overlays
-  if(emu->halt||ui->show_monitors){
+  if(debug){
     SDL_LockTexture(overlay,NULL,(void**)&p,&pitch);
     stride=pitch/sizeof(int);
     octo_ui_begin(&emu->options,p,stride,(dw/ui->win_scale),(dh/ui->win_scale),ui->win_scale);

@@ -76,6 +76,7 @@ int main(int argc, char* argv[]){
     }
     if(e.type==SDL_USEREVENT){
       emu_step(&emu,prog);
+      SDL_FlushEvent(SDL_USEREVENT); // don't queue up repaints if we're running slow!
 
       int bgcolor=emu.options.colors[emu.st>0?OCTO_COLOR_SOUND: OCTO_COLOR_BACKGROUND];
       SDL_SetRenderDrawColor(ren,(bgcolor>>16)&0xFF,(bgcolor>>8)&0xFF,bgcolor&0xFF,0xFF);

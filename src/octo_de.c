@@ -1474,6 +1474,7 @@ int main(int argc,char*argv[]){
     if(state.mode==MODE_TEXT_EDITOR&&!state.text_find)edit_events(&e);
     if(state.mode==MODE_SAVE)save_events(&e);
     if(e.type==SDL_USEREVENT){
+      SDL_FlushEvent(SDL_USEREVENT);
 
       if(input.events[EVENT_FULLSCREEN]){
         ui.windowed=!ui.windowed;

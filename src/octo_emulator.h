@@ -271,6 +271,7 @@ typedef struct {
   // core
   uint8_t  ram[64*1024]; // memory
   uint8_t  px [128*64];  // framebuffer ({0,1,2,3} per pixel)
+  uint8_t  ppx[128*64];  // previous framebuffer (for minimizing repaints)
   uint16_t ret[16];      // return stack
   int      rp;           // return stack pointer
   uint8_t  v[16];        // v registers
@@ -299,6 +300,7 @@ typedef struct {
 
 void octo_emulator_init(octo_emulator* e, char* rom, size_t romsize, octo_options* options, char* flags){
   memset(e,0,sizeof(octo_emulator));
+  memset(e->ppx,-1,sizeof(e->ppx));
   if (options!=NULL) memcpy(&e->options,options,sizeof(octo_options)); else octo_default_options(&e->options);
   if (flags  !=NULL) memcpy(&e->flags,flags,8);
   e->pc=0x200;
