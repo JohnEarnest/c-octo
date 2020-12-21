@@ -511,15 +511,15 @@ int mouse_in(rect*r){
 typedef struct {SDL_Keycode k;int v;} key_mapping;
 key_mapping keys[]={
   {SDLK_x,0},
-  {SDLK_1,1},
-  {SDLK_2,2},
+  {SDLK_1,1},{SDLK_KP_9,1}/*xo-circle*/,
+  {SDLK_2,2},{SDLK_KP_7,2}/*xo-square*/,
   {SDLK_3,3},
-  {SDLK_q,4},{SDLK_F12,4},
-  {SDLK_w,5},{SDLK_UP,5},
-  {SDLK_e,6},{SDLK_SPACE,6},{SDLK_BACKSPACE,6},
-  {SDLK_a,7},{SDLK_LEFT,7},
-  {SDLK_s,8},{SDLK_DOWN,8},
-  {SDLK_d,9},{SDLK_RIGHT,9},
+  {SDLK_q,4},{SDLK_F12,4},{SDLK_KP_3,4}/*xo-cross*/,
+  {SDLK_w,5},{SDLK_UP,5},{SDLK_KP_6,5},
+  {SDLK_e,6},{SDLK_SPACE,6},{SDLK_BACKSPACE,6},{SDLK_KP_1,6}/*xo-check*/,
+  {SDLK_a,7},{SDLK_LEFT,7},{SDLK_KP_4,7},
+  {SDLK_s,8},{SDLK_DOWN,8},{SDLK_KP_2,8},
+  {SDLK_d,9},{SDLK_RIGHT,9},{SDLK_KP_6,9},
   {SDLK_z,10},
   {SDLK_c,11},
   {SDLK_4,12},
@@ -725,8 +725,7 @@ void octo_ui_monitors(octo_emulator*emu,octo_program*prog){
 
 void octo_ui_run(octo_emulator*emu,octo_program*prog,octo_ui_config*ui,SDL_Window*win,SDL_Renderer*ren,SDL_Texture*screen,SDL_Texture*overlay){
   // drop repaints if the display hasn't changed
-  int dirty=0, debug=emu->halt||ui->show_monitors;
-  for(size_t z=0;z<sizeof(emu->px);z++)if(emu->px[z]!=emu->ppx[z]){dirty=1;break;}
+  int dirty=memcmp(emu->px,emu->ppx,sizeof(emu->px))!=0, debug=emu->halt||ui->show_monitors;
   if(!dirty&&!debug)return;
   memcpy(emu->ppx,emu->px,sizeof(emu->ppx));
 
