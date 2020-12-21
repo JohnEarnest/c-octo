@@ -88,13 +88,13 @@ Restart, and you'll have immediate access to Octode from the home screen!
 
 OLPC
 ----
-[OLPC](https://en.wikipedia.org/wiki/OLPC_XO)s are rugged, low-power Linux-based laptops developed for education. All of these devices are based on a distribution of Fedora 18, and while the first model, the XO-1, was based on an i686 "geode" processor, later models use armv7l processors. I've developed a [setup script](https://gist.github.com/JohnEarnest/24cfaf815e01c7c8295dd9e7856c7d02) which will bring an OLPC from its default "out of the box" configuration to a workable development environment. The minimum you can probably get away with is installing a functioning package repository and a c compiler:
+[OLPC](https://en.wikipedia.org/wiki/OLPC_XO)s are rugged, low-power Linux-based laptops developed for education. All of these devices are based on a distribution of Fedora 18, and while the first model, the XO-1, was based on an i586 "Geode" processor, later models use armv7l processors. I've developed a [setup script](https://gist.github.com/JohnEarnest/24cfaf815e01c7c8295dd9e7856c7d02) which will bring an OLPC from its default "out of the box" configuration to a workable development environment. The minimum you can probably get away with is installing a functioning package repository and a c compiler:
 ```
 sudo yum install -y --nogpgcheck http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
 sudo yum install -y gcc-c++ make
 ```
 
-On the ARM OLPCs, SDL2 must be built [from source](https://www.libsdl.org/download-2.0.php). Experimentally, I found that v2.0.2 builds on these machines, and is sufficiently new for `octode`. SDL2 needs some X11 libraries to be able to actually initialize a video driver:
+On the OLPCs, SDL2 must be built [from source](https://www.libsdl.org/download-2.0.php). Experimentally, I found that v2.0.2 builds on these machines, and is sufficiently new for `octode`. SDL2 needs some X11 development libraries present to be able to actually initialize a video driver:
 ```
 sudo yum -y install libX11-devel libXext-devel
 cd ~
@@ -103,9 +103,18 @@ cd sdl2
 wget --no-check-certificate https://www.libsdl.org/release/SDL2-2.0.2.tar.gz
 tar xvzf SDL2-2.0.2.tar.gz
 cd SDL2-2.0.2
+```
+
+On the XO-1 and XO-1.5 (i586), we must explicitly disable the generation of SSE instructions; these don't exist on Geodes, despite what libtool thinks:
+```
+./configure --disable-sse; make; sudo make install
+```
+On the XO-1.75 and XO-4 (ARM devices), `./configure` needs no special flags:
+```
 ./configure; make; sudo make install
 ```
-Make yourself a sandwich; expect this to take about 15 minutes to build. After installation you may need to add `/usr/local/bin` to your path so that you can find `sdl2-config`:
+
+Make yourself a sandwich; expect this to take about 15 minutes to build on an ARM device or closer to 35 on an i586. After installation you may need to add `/usr/local/bin` to your path so that you can find `sdl2-config`:
 ```
 export PATH=/usr/local/bin/:$PATH
 which sdl2-config
