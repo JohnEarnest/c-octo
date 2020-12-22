@@ -128,7 +128,9 @@ Before using `octo-de` or `octo-run`, make the following changes to your newly-m
 ```
 ui.windowed=1
 ui.software_render=1
-ui.win_scale=1
+ui.win_scale=2
+ui.win_width=384
+ui.win_height=192
 ```
 At time of writing, running in fullscreen mode or scaling the UI on the OLPC degrades performance noticeably, especially with the monitor panel open. If Octo runs slowly you may get `(snd_pcm_recover) underrun occurred` warnings at the console- these are harmless, but can be annoying. Setting `ui.volume=0` will disable audio entirely.
 
