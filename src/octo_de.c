@@ -127,7 +127,8 @@ octo_program*prog=NULL;
 #define TOKEN_STRING   3
 #define TOKEN_STRINGE  4
 #define TOKEN_ESCAPE   5
-#define TOKEN_KEYWORD  6
+#define TOKEN_ESCAPEE  6
+#define TOKEN_KEYWORD  7
 
 // horrible forward declarations:
 void import_text_to_pixel_editor(char*text);
@@ -160,10 +161,20 @@ void line_remove(text_line*x,int index){
   x->count--;
 }
 
+int cat_color(int c){
+  return c==TOKEN_COMMENT?SYNTAX_COMMENT:
+         c==TOKEN_KEYWORD?SYNTAX_KEYWORD:
+         c==TOKEN_STRING ?SYNTAX_STRING:
+         c==TOKEN_STRINGE?SYNTAX_STRING:
+         c==TOKEN_ESCAPE ?SYNTAX_ESCAPE:
+         c==TOKEN_ESCAPEE?SYNTAX_ESCAPE:
+         WHITE;
+}
 void text_categorize(int row,int col){
   int prev=TOKEN_NORMAL;
   if     (col>0){text_line*l=octo_list_get(&state.text_lines,row  );prev=line_get_cat(l,col-1);}
   else if(row>0){text_line*l=octo_list_get(&state.text_lines,row-1);prev=line_get_cat(l,l->count-1);if(prev==TOKEN_COMMENT)prev=TOKEN_NORMAL;}
+  if(prev==TOKEN_STRINGE)prev=TOKEN_NORMAL;
   if(prev==TOKEN_KEYWORD)prev=TOKEN_NORMAL;
   if(prev==TOKEN_UNKNOWN)prev=TOKEN_NORMAL;
   while(row<state.text_lines.count){
@@ -171,6 +182,7 @@ void text_categorize(int row,int col){
     text_line*line=octo_list_get(&state.text_lines,row);
     if(col>=line->count){
       if(prev==TOKEN_COMMENT)prev=TOKEN_NORMAL;
+      if(prev==TOKEN_STRINGE)prev=TOKEN_NORMAL;
       row++,col=0; continue;
     }
     char c=line_get(line,col); int n=prev;
@@ -191,12 +203,12 @@ void text_categorize(int row,int col){
       if(c=='\\')n=TOKEN_ESCAPE;
       if(c=='"' )n=TOKEN_STRINGE;
     }
-    else if(prev==TOKEN_ESCAPE)n=TOKEN_STRING;
+    else if(prev==TOKEN_ESCAPE)n=TOKEN_ESCAPEE;
+    else if(prev==TOKEN_ESCAPEE)n=TOKEN_STRING;
     else if(prev==TOKEN_STRINGE)n=TOKEN_NORMAL;
     char t=line_get_cat(line,col);
-    int nn=(n==TOKEN_STRINGE)?TOKEN_STRING: (n==TOKEN_ESCAPE)?TOKEN_STRING: n; // collapse sub-states
-    if(nn==t&&nn!=TOKEN_KEYWORD)break; // we are now aligned with previous calculations; everything after this point will match!
-    line_set_cat(line,col,nn);
+    if(n==t&&n!=TOKEN_KEYWORD)break; // we are now aligned with previous calculations; everything after this point will match!
+    line_set_cat(line,col,n);
     prev=n; col++;
   }
 }
@@ -286,6 +298,7 @@ void text_apply_edit(text_span*from,text_span*to,char*text){
   text_line*start=octo_list_get(&state.text_lines,row);
   for(int z=0;z<start->count;z++)line_set_cat(start,z,TOKEN_UNKNOWN);
   text_categorize(from->start.row,0);
+  text_categorize(row,0);
   state.text_cursor.start.row=state.text_cursor.end.row=row;
   state.text_cursor.start.col=state.text_cursor.end.col=col;
   text_setcursor(col,row);
@@ -638,9 +651,7 @@ void render_text_editor(){
       int in_selection=(min->row==max->row)?(row==min->row&&col>=min->col&&col<max->col):
                        (row>min->row&&row<max->row)||(row==min->row&&col>=min->col)||(row==max->row&&col<max->col);
       if(in_selection)draw_fill(&cp,SYNTAX_SELECTED);
-      int cat=line_get_cat(l,col);
-      int color=cat==TOKEN_STRING?SYNTAX_STRING: cat==TOKEN_COMMENT?SYNTAX_COMMENT: cat==TOKEN_KEYWORD?SYNTAX_KEYWORD: WHITE;
-      draw_char(line_get(l,col),cp.x,cp.y,color);
+      draw_char(line_get(l,col),cp.x,cp.y,cat_color(line_get_cat(l,col)));
     }
     if(l->count-state.text_scroll.col>cx){rect m={tb.x+tb.w+2,tb.y+(r*ch),8,9};draw_icon(&m,MORE_RIGHT,POPCOLOR);}
     if(l->count&&state.text_scroll.col>0){rect m={tb.x-5     ,tb.y+(r*ch),8,9};draw_icon(&m,MORE_LEFT, POPCOLOR);}
