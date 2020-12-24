@@ -170,10 +170,17 @@ int cat_color(int c){
          c==TOKEN_ESCAPEE?SYNTAX_ESCAPE:
          WHITE;
 }
-void text_categorize(int row,int col){
-  int prev=TOKEN_NORMAL;
-  if     (col>0){text_line*l=octo_list_get(&state.text_lines,row  );prev=line_get_cat(l,col-1);}
-  else if(row>0){text_line*l=octo_list_get(&state.text_lines,row-1);prev=line_get_cat(l,l->count-1);if(prev==TOKEN_COMMENT)prev=TOKEN_NORMAL;}
+void text_categorize(int row){
+  int prev=TOKEN_NORMAL, col=0, prevrow=row;
+  while(prevrow>0){
+    // we may need to search across multiple blank lines to find the
+    // preceding character, particularly for string literals:
+    text_line*l=octo_list_get(&state.text_lines,prevrow-1);
+    if(l->count<1){prevrow--;continue;}
+    prev=line_get_cat(l,l->count-1);
+    if(prev==TOKEN_COMMENT)prev=TOKEN_NORMAL;
+    break;
+  }
   if(prev==TOKEN_STRINGE)prev=TOKEN_NORMAL;
   if(prev==TOKEN_KEYWORD)prev=TOKEN_NORMAL;
   if(prev==TOKEN_UNKNOWN)prev=TOKEN_NORMAL;
@@ -297,8 +304,8 @@ void text_apply_edit(text_span*from,text_span*to,char*text){
   // bother to preserve the existing category information for our fused line.
   text_line*start=octo_list_get(&state.text_lines,row);
   for(int z=0;z<start->count;z++)line_set_cat(start,z,TOKEN_UNKNOWN);
-  text_categorize(from->start.row,0);
-  text_categorize(row,0);
+  text_categorize(from->start.row);
+  text_categorize(row);
   state.text_cursor.start.row=state.text_cursor.end.row=row;
   state.text_cursor.start.col=state.text_cursor.end.col=col;
   text_setcursor(col,row);
@@ -345,7 +352,7 @@ void text_import(char*text){
     else if(c=='\t'){line_insert(l,l->count,' ');}
     else            {line_insert(l,l->count,c<' '?'@': c>'~'?'@': c);}
   }
-  text_categorize(0,0);
+  text_categorize(0);
   state.dirty=0;
 }
 
