@@ -486,6 +486,13 @@ int octo_register(octo_program*p){
   return octo_free_tok(t), isdigit(c)?c-'0': 10+(c-'a');
 }
 
+int octo_value_range(octo_program*p,int n,int mask){
+  if(mask==0xF   &&(n<   0||n>mask)) p->is_error=1, snprintf(p->error,OCTO_ERR_MAX,"Argument %d does not fit in 4 bits- must be in range [0,15].",n);
+  if(mask==0xFF  &&(n<-128||n>mask)) p->is_error=1, snprintf(p->error,OCTO_ERR_MAX,"Argument %d does not fit in a byte- must be in range [-128,255].",n);
+  if(mask==0xFFF &&(n<   0||n>mask)) p->is_error=1, snprintf(p->error,OCTO_ERR_MAX,"Argument %d does not fit in 12 bits.",n);
+  if(mask==0xFFFF&&(n<   0||n>mask)) p->is_error=1, snprintf(p->error,OCTO_ERR_MAX,"Argument %d does not fit in 16 bits.",n);
+  return n&mask;
+}
 void octo_value_fail(octo_program*p,char*w,char*n,int undef){
   if(p->is_error)return;
   if     (octo_is_register(p,n))p->is_error=1, snprintf(p->error,OCTO_ERR_MAX,"Expected %s value, but found the register %s.",w,n);
@@ -497,12 +504,11 @@ int octo_value_4bit(octo_program*p){
   octo_tok*t=octo_next(p);
   if(t->type==OCTO_TOK_NUM){
     int n=t->num_value; octo_free_tok(t);
-    if(n<0||n>15) p->is_error=1, snprintf(p->error,OCTO_ERR_MAX,"Argument %d does not fit in 4 bits- must be in range [0,15].",n);
-    return n&0xF;
+    return octo_value_range(p,n,0xF);
   }
   char*n=t->str_value; octo_free_tok(t);
   octo_const*c=octo_map_get(&p->constants,n);
-  if(c!=NULL)return((int)c->value)&0xF;
+  if(c!=NULL)return octo_value_range(p,c->value,0xF);
   return octo_value_fail(p,"a 4-bit",n,1),0;
 }
 int octo_value_8bit(octo_program*p){
@@ -510,12 +516,11 @@ int octo_value_8bit(octo_program*p){
   octo_tok*t=octo_next(p);
   if(t->type==OCTO_TOK_NUM){
     int n=t->num_value; octo_free_tok(t);
-    if(n<-128||n>255) p->is_error=1, snprintf(p->error,OCTO_ERR_MAX,"Argument %d does not fit in a byte- must be in range [-128,255].",n);
-    return n&0xFF;
+    return octo_value_range(p,n,0xFF);
   }
   char*n=t->str_value; octo_free_tok(t);
   octo_const*c=octo_map_get(&p->constants,n);
-  if(c!=NULL)return((int)c->value)&0xFF;
+  if(c!=NULL)return octo_value_range(p,c->value,0xFF);
   return octo_value_fail(p,"an 8-bit",n,1),0;
 }
 int octo_value_12bit(octo_program*p){
@@ -523,12 +528,11 @@ int octo_value_12bit(octo_program*p){
   octo_tok*t=octo_next(p);
   if(t->type==OCTO_TOK_NUM){
     int n=t->num_value; octo_free_tok(t);
-    if(n<0||n>0xFFF) p->is_error=1, snprintf(p->error,OCTO_ERR_MAX,"Argument %d does not fit in 12 bits.",n);
-    return n&0xFFF;
+    return octo_value_range(p,n,0xFFF);
   }
   char*n=t->str_value; int proto_line=t->line, proto_pos=t->pos; octo_free_tok(t);
   octo_const*c=octo_map_get(&p->constants,n);
-  if(c!=NULL)return((int)c->value)&0xFFF;
+  if(c!=NULL)return octo_value_range(p,c->value,0xFFF);
   octo_value_fail(p,"a 12-bit",n,0);
   if(p->is_error)return 0;
   if(!octo_check_name(p,n,"label"))return 0;
@@ -542,12 +546,11 @@ int octo_value_16bit(octo_program*p,int can_forward_ref,int offset){
   octo_tok*t=octo_next(p);
   if(t->type==OCTO_TOK_NUM){
     int n=t->num_value; octo_free_tok(t);
-    if(n<0||n>0xFFFF) p->is_error=1, snprintf(p->error,OCTO_ERR_MAX,"Argument %d does not fit in 16 bits.",n);
-    return n&0xFFFF;
+    return octo_value_range(p,n,0xFFFF);
   }
   char*n=t->str_value; int proto_line=t->line, proto_pos=t->pos; octo_free_tok(t);
   octo_const*c=octo_map_get(&p->constants,n);
-  if(c!=NULL)return((int)c->value)&0xFFFF;
+  if(c!=NULL)return octo_value_range(p,c->value,0xFFFF);
   octo_value_fail(p,"a 16-bit",n,0);
   if(p->is_error)return 0;
   if(!octo_check_name(p,n,"label"))return 0;

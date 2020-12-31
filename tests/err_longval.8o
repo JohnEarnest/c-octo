@@ -1,0 +1,5 @@
+:const long_value 5030
+: main
+	v5 := 7
+	v4 := long_value
+

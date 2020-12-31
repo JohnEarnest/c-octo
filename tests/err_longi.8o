@@ -1,0 +1,5 @@
+:const long_address 5030
+: main
+	v5 := 7
+	i := long_address
+
