@@ -370,6 +370,12 @@ void octo_fetch_token(octo_program*p) {
     else if(str_buffer[0]=='0'&&str_buffer[1]=='x'){
       t->type=OCTO_TOK_NUM, t->num_value=strtol(str_buffer+2,NULL,16);
     }
+    else if(str_buffer[0]=='-'&&str_buffer[1]=='0'&&str_buffer[2]=='b'){
+      t->type=OCTO_TOK_NUM, t->num_value=-strtol(str_buffer+3,NULL,2);
+    }
+    else if(str_buffer[0]=='-'&&str_buffer[1]=='0'&&str_buffer[2]=='x'){
+      t->type=OCTO_TOK_NUM, t->num_value=-strtol(str_buffer+3,NULL,16);
+    }
     else{
       t->type=OCTO_TOK_STR, t->str_value=octo_intern(p,str_buffer);
     }

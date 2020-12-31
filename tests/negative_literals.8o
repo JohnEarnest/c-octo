@@ -1,0 +1,8 @@
+: main
+	# these were created as an accident in the web-octo parser,
+	# so they are here for compatibility.
+	# negating a literal makes it two's complement.
+
+	-23
+	-0x3A
+	-0b1
