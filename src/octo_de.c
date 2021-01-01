@@ -1214,7 +1214,7 @@ void open_choose(){
     if(stat(filename,&st)!=0){snprintf(state.text_status,sizeof(state.text_status),"Unable to open file '%s'",entry->name);state.text_err=1;return;}
     size_t source_size=st.st_size;
     char*source_bytes=malloc(source_size+1);
-    FILE*source_file=fopen(filename,"r");
+    FILE*source_file=fopen(filename,"rb");
     fread(source_bytes,sizeof(char),source_size,source_file);
     fclose(source_file);
     octo_str source;
@@ -1289,7 +1289,7 @@ void save_file(){
   char filename[OCTO_PATH_MAX]="\0";
   octo_path_append(filename,state.open_path);
   octo_path_append(filename,state.open_name);
-  FILE*file=fopen(filename,"w");
+  FILE*file=fopen(filename,"wb");
   if(file==NULL){
     snprintf(state.text_status,sizeof(state.text_status),"Unable to write octocart '%s'",state.open_name);state.text_err=1;
     state.mode=MODE_TEXT_EDITOR;
