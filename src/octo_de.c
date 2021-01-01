@@ -341,6 +341,8 @@ void text_import(char*text){
   state.text_cursor.start.col=0;
   state.text_cursor.end  .row=0;
   state.text_cursor.end  .col=0;
+  state.text_scroll.row=0;
+  state.text_scroll.col=0;
   state.text_timer=0;
   while(state.text_lines.count)line_destroy((text_line*)octo_list_remove(&state.text_lines,0));
   text_line* l=line_create();
