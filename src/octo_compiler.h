@@ -754,8 +754,10 @@ void octo_resolve_label(octo_program*p,int offset){
   char*n=octo_identifier(p,"label");
   if(p->is_error)return;
   if(octo_map_get(&p->constants,n)!=NULL){
-    p->is_error=1, snprintf(p->error,OCTO_ERR_MAX,"The name '%s' has already been defined.",n);
-    return;
+    p->is_error=1, snprintf(p->error,OCTO_ERR_MAX,"The name '%s' has already been defined.",n); return;
+  }
+  if(octo_map_get(&p->aliases,n)!=NULL){
+    p->is_error=1, snprintf(p->error,OCTO_ERR_MAX,"The name '%s' is already used by an alias.",n); return;
   }
   if((target==0x202||target==0x200)&&(strcmp(n,"main")==0)){
     p->has_main=0, p->here=target=0x200;
@@ -867,6 +869,7 @@ void octo_compile_statement(octo_program*p){
   else if(octo_match(p,":proto"))octo_free_tok(octo_next(p));//deprecated
   else if(octo_match(p,":alias")){
     char*n=octo_identifier(p,"alias");
+    if(octo_map_get(&p->constants,n)!=NULL){p->is_error=1,snprintf(p->error,OCTO_ERR_MAX,"The name '%s' is already used by a constant.",n);return;}
     int v=octo_peek_match(p,"{",0)?octo_calculated(p,"ANONYMOUS"):octo_register(p);
     if(v<0||v>15){p->is_error=1;snprintf(p->error,OCTO_ERR_MAX,"Register index must be in the range [0,F].");return;}
     octo_reg*prev=octo_map_set(&p->aliases,n,octo_make_reg(v));

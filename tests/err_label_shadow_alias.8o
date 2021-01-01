@@ -1,0 +1,5 @@
+: main
+	:alias foo v4
+: foo
+	foo := 0
+	i := foo
