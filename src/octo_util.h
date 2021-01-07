@@ -375,12 +375,12 @@ char* stralloc(char*source){
 #define EVENT_NEW              5
 #define EVENT_OPEN             6
 #define EVENT_SAVE             7
-#define EVENT_COMMAND_E        8
-#define EVENT_COMMAND_P        9
+#define EVENT_SPRITE           8
+#define EVENT_PALETTE          9
 #define EVENT_COPY            10
 #define EVENT_CUT             11
 #define EVENT_PASTE           12
-#define EVENT_COMMAND_SLASH   13
+#define EVENT_TOGGLE_COMMENT  13
 #define EVENT_MOUSEDOWN       14
 #define EVENT_MOUSEUP         15
 #define EVENT_UP              16
@@ -441,12 +441,12 @@ void events_queue(SDL_Event*e){
     if(code==SDLK_n&&cmd)input.events[EVENT_NEW      ]=1;
     if(code==SDLK_o&&cmd)input.events[EVENT_OPEN     ]=1;
     if(code==SDLK_s&&cmd)input.events[EVENT_SAVE     ]=1;
-    if(code==SDLK_e&&cmd)input.events[EVENT_COMMAND_E]=1;
-    if(code==SDLK_p&&cmd)input.events[EVENT_COMMAND_P]=1;
+    if(code==SDLK_e&&cmd)input.events[EVENT_SPRITE   ]=1;
+    if(code==SDLK_p&&cmd)input.events[EVENT_PALETTE  ]=1;
     if(code==SDLK_c&&cmd)input.events[EVENT_COPY     ]=1;
     if(code==SDLK_x&&cmd)input.events[EVENT_CUT      ]=1;
     if(code==SDLK_v&&cmd)input.events[EVENT_PASTE    ]=1;
-    if(code==SDLK_SLASH&&cmd)input.events[EVENT_COMMAND_SLASH]=1;
+    if(code==SDLK_SLASH&&cmd)input.events[EVENT_TOGGLE_COMMENT]=1;
     if(code==SDLK_UP   )input.events[EVENT_UP   ]=1;
     if(code==SDLK_DOWN )input.events[EVENT_DOWN ]=1;
     if(code==SDLK_LEFT )input.events[EVENT_LEFT ]=1;

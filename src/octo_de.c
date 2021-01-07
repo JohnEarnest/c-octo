@@ -423,6 +423,13 @@ text_span get_ordered_cursor(){
   text_span span; span.start=*min; span.end=*max;
   return span;
 }
+text_span get_ordered_block(){
+  text_span span=get_ordered_cursor();
+  span.start.col=0;
+  text_line*line=octo_list_get(&state.text_lines,span.end.row);
+  span.end.col=MAX(line->count,0);
+  return span;
+}
 
 void edit_events(SDL_Event*e){
   text_span span=get_ordered_cursor();
@@ -510,12 +517,12 @@ void render_text_editor(){
     if(state.dirty)state.mode=MODE_NEW_UNSAVED;
     else new_file();
   }
-  if(widget_menubutton(&mb,NULL,ICON_PIXEL_EDITOR, EVENT_COMMAND_E)){
+  if(widget_menubutton(&mb,NULL,ICON_PIXEL_EDITOR, EVENT_SPRITE)){
     import_text_to_pixel_editor(text_export_selection());
     state.mode=MODE_PIXEL_EDITOR;
   }
-  if(widget_menubutton(&mb,NULL,ICON_PALETTE_EDITOR,EVENT_COMMAND_P))state.mode=MODE_PALETTE_EDITOR;
-  if(widget_menubutton(&mb,NULL,ICON_GEAR,          EVENT_NONE     ))state.mode=MODE_CONFIG;
+  if(widget_menubutton(&mb,NULL,ICON_PALETTE_EDITOR,EVENT_PALETTE))state.mode=MODE_PALETTE_EDITOR;
+  if(widget_menubutton(&mb,NULL,ICON_GEAR,          EVENT_NONE   ))state.mode=MODE_CONFIG;
   if(widget_menubutton(&mb,NULL,ICON_CANCEL,EVENT_ESCAPE)){
     if(state.text_find)text_end_find();
     else if (state.dirty)state.mode=MODE_QUIT_UNSAVED;
@@ -580,6 +587,36 @@ void render_text_editor(){
         snprintf(state.text_status,sizeof(state.text_status),"Pasted %d character%s.",len,len==1?"":"s");state.text_err=0;
       }
       if(text!=NULL)SDL_free(text);
+    }
+    if(input.events[EVENT_TOGGLE_COMMENT]){
+      // determine whether this block is already commented:
+      int first=MIN(head->row,tail->row), last=MAX(head->row,tail->row), len=last-first+1, all_comments=1;
+      for(int z=first;z<=last;z++){
+        text_line*line=octo_list_get(&state.text_lines,z);
+        int i=0;
+        while(i<line->count&&isspace(line_get(line,i)))i++;
+        if(i>=line->count||line_get(line,i)!='#')all_comments=0;
+      }
+      // prepare a replacement block
+      octo_str r;
+      octo_str_init(&r);
+      for(int z=first;z<=last;z++){
+        if(z!=first)octo_str_append(&r,'\n');
+        text_line*line=octo_list_get(&state.text_lines,z);
+        if(all_comments){// strip first comment
+          int found_first=0;
+          for(int col=0;col<line->count;col++)if(!found_first&&line_get(line,col)=='#'){found_first=1;}else{octo_str_append(&r,line_get(line,col));}
+        }
+        else{// insert leading comment
+          octo_str_append(&r,'#');
+          for(int col=0;col<line->count;col++)octo_str_append(&r,line_get(line,col));
+        }
+      }
+      octo_str_append(&r,'\0');
+      text_span span=get_ordered_block();
+      text_new_edit(&span,stralloc(r.root));
+      octo_str_destroy(&r);
+      snprintf(state.text_status,sizeof(state.text_status),"%sommented %d line%s.",all_comments?"Un-c":"C",len,len==1?"":"s");state.text_err=0;
     }
   }
   else{
