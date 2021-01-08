@@ -20,6 +20,15 @@ if ! cmp -s temp.8o carts/test_tiny.8o; then
 fi
 rm -rf temp.8o
 
+# does decoding work if the program contains an error?
+$COMPILER carts/test_badcode.gif temp.8o
+if ! cmp -s temp.8o carts/test_badcode.8o; then
+	echo "reference source code doesn't match for test_badcode.gif:"
+	cmp -lb carts/test_badcode.8o temp.8o
+	exit 1
+fi
+rm -rf temp.8o
+
 # does decoding work for an image mangled by another tool?
 $COMPILER carts/test_optimized.gif temp.8o
 if ! cmp -s temp.8o carts/test_tiny.8o; then

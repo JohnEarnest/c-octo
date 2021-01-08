@@ -11,6 +11,15 @@
 #include "octo_emulator.h"
 #include "octo_cartridge.h"
 
+void compile(char*source,FILE*dest_file){
+  octo_program*p=octo_compile_str(source);
+  if(p->is_error){
+    fprintf(stderr,"(%d:%d) %s\n",p->error_line+1,p->error_pos+1,p->error);
+    exit(1);
+  }
+  fwrite(p->rom+0x200,sizeof(char),p->length-0x200,dest_file);
+}
+
 int main(int argc,char** argv) {
   if(argc<2){
     printf("octo-cli v1.0\n");
@@ -43,27 +52,16 @@ int main(int argc,char** argv) {
     fclose(source_file);
   }
 
-  // compile
-  octo_program*p=octo_compile_str(source);
-  if(p->is_error){
-    fprintf(stderr,"(%d:%d) %s\n",p->error_line+1,p->error_pos+1,p->error);
+  // write output { .ch8, .8o, .gif }
+  if(argc<=2){compile(source,stdout);return 0;}
+  char*dest_filename=argv[2];
+  FILE*dest_file=fopen(dest_filename,"wb");
+  if(dest_file==NULL){
+    fprintf(stderr,"%s: Unable to open file for writing\n",dest_filename);
     return 1;
   }
-
-  // write output { .ch8, .8o, .gif }
-  if(argc>2){
-    char*dest_filename=argv[2];
-    FILE*dest_file=fopen(dest_filename,"wb");
-    if(dest_file==NULL){
-      fprintf(stderr,"%s: Unable to open file for writing\n",dest_filename);
-      return 1;
-    }
-    if     (strcmp(".gif",dest_filename+(strlen(dest_filename)-4))==0){octo_cart_save(dest_file,source,&o,NULL,dest_filename);}
-    else if(strcmp(".8o", dest_filename+(strlen(dest_filename)-3))==0){fwrite(source,sizeof(char),strlen(source),dest_file);}
-    else                                                              {fwrite(p->rom+0x200,sizeof(char),p->length-0x200,dest_file);}
-    fclose(dest_file);
-  }
-  else {
-    fwrite(p->rom+0x200,sizeof(char),p->length-0x200,stdout);
-  }
+  if     (strcmp(".gif",dest_filename+(strlen(dest_filename)-4))==0){octo_cart_save(dest_file,source,&o,NULL,dest_filename);}
+  else if(strcmp(".8o", dest_filename+(strlen(dest_filename)-3))==0){fwrite(source,sizeof(char),strlen(source),dest_file);}
+  else                                                              {compile(source,dest_file);}
+  fclose(dest_file);
 }

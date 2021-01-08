@@ -1,0 +1,5 @@
+
+# this program won't compile:
+
+: main
+ v0 := beppis
