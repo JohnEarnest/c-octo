@@ -35,6 +35,8 @@ You can also move the cursor or select text by using the mouse, and use a mouse 
 - `Ctrl`+`p`: Open the palette editor.
 - `Ctrl`+`f`: Find. If you have text selected, it will be used as the search term.
 - `Ctrl`+`/`: Toggle commenting for the current (or selected) line(s).
+- `Tab`: Indent the selected line(s).
+- `Tab`+`Shift`: Unindent the selected line(s).
 
 In _Find_ mode, the status bar is replaced by a search term. As you type, the selection cursor will move to the first result in the document:
 

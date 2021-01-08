@@ -59,6 +59,7 @@ typedef struct {
   text_pos end;
 } text_span;
 typedef struct {
+  int       keep_sel;
   text_span old_span;
   text_span new_span;
   char*     old_data;
@@ -267,7 +268,7 @@ void clear_text_hist(int limit){
     free(edit->old_data),free(edit->new_data),free(edit);
   }
 }
-void text_apply_edit(text_span*from,text_span*to,char*text){
+void text_apply_edit(text_span*from,text_span*to,char*text,int keep_sel){
   // delete contents of "from" span:
   if(from->start.row==from->end.row){
     text_line*line=octo_list_get(&state.text_lines,from->start.row);
@@ -306,34 +307,47 @@ void text_apply_edit(text_span*from,text_span*to,char*text){
   for(int z=0;z<start->count;z++)line_set_cat(start,z,TOKEN_UNKNOWN);
   text_categorize(from->start.row);
   text_categorize(row);
-  state.text_cursor.start.row=state.text_cursor.end.row=row;
-  state.text_cursor.start.col=state.text_cursor.end.col=col;
-  text_setcursor(col,row);
+  if(keep_sel){
+    state.text_cursor.start.row=from->start.row;
+    state.text_cursor.start.col=from->start.col;
+    state.text_cursor.end.row=row;
+    state.text_cursor.end.col=col;
+    // this hack again:
+    state.text_find=1;
+    text_setcursor(col,row);
+    state.text_find=0;
+  }
+  else{
+    state.text_cursor.start.row=state.text_cursor.end.row=row;
+    state.text_cursor.start.col=state.text_cursor.end.col=col;
+    text_setcursor(col,row);
+  }
   state.dirty=1;
 }
 void text_undo(){
   if(state.text_hist_index<=0)return;
   state.text_hist_index--;
   text_edit*edit=octo_list_get(&state.text_hist,state.text_hist_index);
-  text_apply_edit(&edit->new_span,&edit->old_span,edit->old_data);
+  text_apply_edit(&edit->new_span,&edit->old_span,edit->old_data,edit->keep_sel);
 }
 void text_redo(){
   if(state.text_hist_index>=state.text_hist.count)return;
   text_edit*edit=octo_list_get(&state.text_hist,state.text_hist_index);
   state.text_hist_index++;
-  text_apply_edit(&edit->old_span,&edit->new_span,edit->new_data);
+  text_apply_edit(&edit->old_span,&edit->new_span,edit->new_data,edit->keep_sel);
 }
-void text_new_edit(text_span*span,char* insert){
+void text_new_edit(text_span*span,char* insert,int keep_sel){
   // spans in history MUST be ordered: start<=end.
   // todo: attempt to coalesce sequential edits together?
   clear_text_hist(state.text_hist_index);
   text_edit*edit=malloc(sizeof(text_edit));
   octo_list_append(&state.text_hist,edit);
   state.text_hist_index++;
+  edit->keep_sel=keep_sel;
   edit->old_span=*span;
   edit->old_data=text_export_span(span);
   edit->new_data=insert;
-  text_apply_edit(&edit->old_span,&edit->new_span,insert);
+  text_apply_edit(&edit->old_span,&edit->new_span,insert,keep_sel);
 }
 void text_import(char*text){
   clear_text_hist(0);
@@ -434,12 +448,12 @@ text_span get_ordered_block(){
 void edit_events(SDL_Event*e){
   text_span span=get_ordered_cursor();
   if(e->type==SDL_TEXTINPUT){
-    text_new_edit(&span,stralloc(e->text.text));
+    text_new_edit(&span,stralloc(e->text.text),0);
   }
   if(e->type==SDL_KEYDOWN){
     int code=e->key.keysym.sym;
     if(code==SDLK_RETURN){
-      text_new_edit(&span,stralloc("\n"));
+      text_new_edit(&span,stralloc("\n"),0);
     }
     if(code==SDLK_BACKSPACE){
       if(span.start.row==span.end.row&&span.start.col==span.end.col){
@@ -447,7 +461,7 @@ void edit_events(SDL_Event*e){
         else if(span.start.row==0){return;}
         else{text_line*line=octo_list_get(&state.text_lines,span.start.row-1); span.start.col=line->count, span.start.row--;}
       }
-      text_new_edit(&span,stralloc(""));
+      text_new_edit(&span,stralloc(""),0);
     }
     if(code==SDLK_DELETE){
       if(span.start.row==span.end.row&&span.start.col==span.end.col){
@@ -456,7 +470,7 @@ void edit_events(SDL_Event*e){
         else if(span.end.row==state.text_lines.count){return;}
         else{span.end.row++,span.end.col=0;}
       }
-      text_new_edit(&span,stralloc(""));
+      text_new_edit(&span,stralloc(""),0);
     }
 
     text_pos*head=&state.text_cursor.end;
@@ -565,7 +579,7 @@ void render_text_editor(){
       if(len>1){
         SDL_SetClipboardText(text);
         text_span span=get_ordered_cursor();
-        text_new_edit(&span,stralloc(""));
+        text_new_edit(&span,stralloc(""),0);
         snprintf(state.text_status,sizeof(state.text_status),"Cut %d character%s.",len,len==1?"":"s");state.text_err=0;
       }
       free(text);
@@ -583,14 +597,15 @@ void render_text_editor(){
       if(text!=NULL&&strlen(text)>=1){
         int len=strlen(text);
         text_span span=get_ordered_cursor();
-        text_new_edit(&span,stralloc(text));
+        text_new_edit(&span,stralloc(text),1);
         snprintf(state.text_status,sizeof(state.text_status),"Pasted %d character%s.",len,len==1?"":"s");state.text_err=0;
       }
       if(text!=NULL)SDL_free(text);
     }
+    int block_sel=(head->row!=tail->row)||(head->col!=tail->col), first=MIN(head->row,tail->row), last=MAX(head->row,tail->row), len=last-first+1;
     if(input.events[EVENT_TOGGLE_COMMENT]){
       // determine whether this block is already commented:
-      int first=MIN(head->row,tail->row), last=MAX(head->row,tail->row), len=last-first+1, all_comments=1;
+      int all_comments=1;
       for(int z=first;z<=last;z++){
         text_line*line=octo_list_get(&state.text_lines,z);
         int i=0;
@@ -614,9 +629,27 @@ void render_text_editor(){
       }
       octo_str_append(&r,'\0');
       text_span span=get_ordered_block();
-      text_new_edit(&span,stralloc(r.root));
+      text_new_edit(&span,stralloc(r.root),1);
       octo_str_destroy(&r);
       snprintf(state.text_status,sizeof(state.text_status),"%sommented %d line%s.",all_comments?"Un-c":"C",len,len==1?"":"s");state.text_err=0;
+    }
+    if((input.events[EVENT_NEXT]||input.events[EVENT_PREV])&&block_sel){
+      int indent=input.events[EVENT_NEXT];
+      octo_str r;
+      octo_str_init(&r);
+      for(int z=first;z<=last;z++){
+        if(z!=first)octo_str_append(&r,'\n');
+        text_line*line=octo_list_get(&state.text_lines,z);
+        int col=0;
+        if(indent){octo_str_append(&r,' ');}
+        else{if(col<line->count&&line_get(line,col)==' ')col++;}
+        for(;col<line->count;col++)octo_str_append(&r,line_get(line,col));
+      }
+      octo_str_append(&r,'\0');
+      text_span span=get_ordered_block();
+      text_new_edit(&span,stralloc(r.root),1);
+      octo_str_destroy(&r);
+      snprintf(state.text_status,sizeof(state.text_status),"%sndented %d line%s.",indent?"I":"Uni",len,len==1?"":"s");state.text_err=0;
     }
   }
   else{
@@ -1157,7 +1190,7 @@ void render_pixel_editor(){
     if(widget_menubutton(&mb,NULL,ICON_CONFIRM,EVENT_ENTER)){
       state.mode=MODE_TEXT_EDITOR;
       text_span span=get_ordered_cursor();
-      text_new_edit(&span,export_text_from_pixel_editor());
+      text_new_edit(&span,export_text_from_pixel_editor(),1);
     }
   }
   // palette
