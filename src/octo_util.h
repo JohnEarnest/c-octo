@@ -578,6 +578,7 @@ void events_joystick(octo_emulator*emu, SDL_Joystick**joy, SDL_Event*e){
 #define MENU_WIDTH 32
 
 int widget_menubutton(rect*pos,char*label,char*icon,int event){
+  if(pos->y+2*pos->h>th)pos->h=th-pos->y; // last button in a column
   int active=mouse_in(pos)&&in_box(pos,input.down_x,input.down_y);
   draw_fill(pos,active?POPCOLOR:BLACK);
   if(pos->y!=0) draw_hline(pos->x,pos->x+pos->w-1,pos->y,WHITE);
@@ -599,6 +600,7 @@ void widget_menuspacer(rect*pos){
   pos->y+=pos->h;
 }
 int widget_menucolor(rect*pos,int color,int*selected){
+  if(pos->y+2*pos->h>th)pos->h=th-pos->y; // last button in a column
   char* labels[]={"0","1","2","3",NULL,NULL};
   char* icons []={NULL,NULL,NULL,NULL,ICON_QUIET,ICON_SOUND};
   int   events[]={EVENT_1,EVENT_2,EVENT_3,EVENT_4,EVENT_5,EVENT_6};
