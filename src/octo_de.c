@@ -28,6 +28,10 @@
 #define LEGEND_SPACE 16
 #define AUDIO_FRAG_SIZE 256
 
+#ifndef VERSION
+#define VERSION "1.1w"
+#endif
+
 char*default_program=
   "# Welcome to OctoDE v"VERSION"!\n\n"
   ": main\n"
