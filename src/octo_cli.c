@@ -22,7 +22,7 @@ void compile(char*source,FILE*dest_file){
 
 int main(int argc,char** argv) {
   if(argc<2){
-    printf("octo-cli v1.0\n");
+    printf("octo-cli v%s\n",VERSION);
     printf("usage: %s <source> [<destination>]\n",argv[0]);
     return 0;
   }

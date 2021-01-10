@@ -1,6 +1,7 @@
 
 DESTDIR=""
 PREFIX="/usr/local"
+VERSION="1.1"
 INSTALLDIR=$(DESTDIR)$(PREFIX)/bin/
 SDL=$(shell sdl2-config --cflags --libs)
 UNAME=$(shell uname)
@@ -30,15 +31,15 @@ clean:
 
 cli:
 	@mkdir -p build
-	@$(COMPILER) src/octo_cli.c -o build/octo-cli $(FLAGS)
+	@$(COMPILER) src/octo_cli.c -o build/octo-cli $(FLAGS) -DVERSION="\"$(VERSION)\""
 
 run:
 	@mkdir -p build
-	@$(COMPILER) src/octo_run.c -o build/octo-run $(SDL) $(FLAGS)
+	@$(COMPILER) src/octo_run.c -o build/octo-run $(SDL) $(FLAGS) -DVERSION="\"$(VERSION)\""
 
 ide:
 	@mkdir -p build
-	@$(COMPILER) src/octo_de.c -o build/octo-de $(SDL) $(FLAGS)
+	@$(COMPILER) src/octo_de.c -o build/octo-de $(SDL) $(FLAGS) -DVERSION="\"$(VERSION)\""
 
 install:
 	@cp build/octo-cli $(INSTALLDIR)octo-cli
@@ -67,3 +68,8 @@ testrun: run
 
 testide: ide
 	./build/octo-de
+
+testregress: cli
+	@./scripts/test_compiler.sh ../Octo/octo
+	@rm -rf temp.ch8
+	@rm -rf temp.err

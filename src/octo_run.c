@@ -29,7 +29,7 @@ octo_emulator emu;
 
 int main(int argc, char* argv[]){
   if(argc<2){
-    printf("octo-run v1.0\n");
+    printf("octo-run v%s\n",VERSION);
     printf("usage: %s <source>\nwhere <source> is a .ch8 or .8o\n",argv[0]);
     return 0;
   }
