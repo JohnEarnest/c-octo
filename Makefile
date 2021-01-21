@@ -12,11 +12,11 @@ ifeq ($(UNAME),Darwin)
 endif
 ifeq ($(UNAME),Linux)
 	COMPILER=gcc
-	FLAGS=-std=c99 -lm -Wall -Werror -Wextra
+	FLAGS=-std=c99 -lm -Wall -Werror -Wextra -Wno-format-truncation
 endif
 ifeq ($(findstring MINGW,$(UNAME)),MINGW)
 	COMPILER=gcc
-	FLAGS=-Wall -Werror -Wextra
+	FLAGS=-Wall -Werror -Wextra -Wno-format-truncation
 	WINDOWS_SDL_PATH=C:/mingw_dev_lib
 	SDL=-I$(WINDOWS_SDL_PATH)/include/SDL2 -L$(WINDOWS_SDL_PATH)/lib -lmingw32 -lSDL2main -lSDL2
 endif
