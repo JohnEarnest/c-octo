@@ -3,6 +3,21 @@ C-Octo Build Guide
 This document collects information about building and using C-Octo on various host operating systems and devices.
 Start by [obtaining a copy of the c-octo repository](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository#about-cloning-a-repository) and navigating to its root via your favorite terminal application.
 
+Raspberry Pi OS / Raspbian / Debian
+-----------------------------------
+Install SDL2 and its dev package.
+```
+sudo apt install libsdl2-2.0-0 libsdl2-dev 
+```
+You need to install the dev package even though libsdl2-2.0-0 may come pre-installed.
+
+You can then use the Makefile to build and install:
+```
+make && sudo make install
+```
+
+Using `sudo make install` seperately may cause errors.
+
 MacOS X
 -------
 First, install SDL2. The easiest way is probably to use [MacPorts](https://www.macports.org) or [Homebrew](https://brew.sh):
@@ -15,7 +30,7 @@ You can then use the Makefile to build and install:
 make && sudo make install
 ```
 
-The same procedure, modulo the choice of package manager, will work on most Linux distros.
+
 
 Windows (MinGW)
 ---------------
