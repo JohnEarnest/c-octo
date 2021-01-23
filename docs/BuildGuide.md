@@ -1,7 +1,7 @@
 C-Octo Build Guide
 ==================
 This document collects information about building and using C-Octo on various host operating systems and devices.
-Start by [obtaining a copy of the c-octo repository]https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository#about-cloning-a-repository) and navigating to its root via your favorite terminal application.
+Start by [obtaining a copy of the c-octo repository](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository#about-cloning-a-repository) and navigating to its root via your favorite terminal application.
 
 MacOS X
 -------
