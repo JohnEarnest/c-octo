@@ -16,7 +16,19 @@ You can then use the Makefile to build and install:
 make && sudo make install
 ```
 
-Using `sudo make install` seperately may cause errors.
+Using `sudo make install` seperately from `make` may produce errors. If you aren't sure of what you're doing, run both as listed above.
+
+Ubuntu 20.04 (Focal Fossa)
+--------------------------
+
+Some Ubuntu variants do not ship with build tools. Make sure they are installed using the following commands:
+```
+sudo apt update
+sudo apt install build-essential git manpages-dev
+```
+This may take a bit depending on the speeds of your connection and boot medium. 
+
+Afterward, follow the steps for Raspberry Pi OS / Debian. The package names are the same for SDL.
 
 MacOS X
 -------
