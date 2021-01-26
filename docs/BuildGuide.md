@@ -7,9 +7,10 @@ Raspberry Pi OS / Raspbian / Debian
 -----------------------------------
 Install SDL2 and its dev package.
 ```
+sudo apt update
 sudo apt install libsdl2-2.0-0 libsdl2-dev 
 ```
-You need to install the dev package even though libsdl2-2.0-0 may come pre-installed.
+You need to install the dev package even though libsdl2-2.0-0 may come pre-installed. If you do not, you will get build errors referring to a missing `SDL.h`.
 
 You can then use the Makefile to build and install:
 ```
@@ -17,6 +18,8 @@ make && sudo make install
 ```
 
 Using `sudo make install` seperately from `make` may produce errors. If you aren't sure of what you're doing, run both as listed above.
+
+If you are on a Raspberry Pi and see slow performance with default settings, try setting `ui.software_render=1` in `~/.octo.rc`. Some hardware & driver combinations have poor hardware draw performance. Setting rendering to software mode may compensate for it.
 
 Ubuntu 20.04 (Focal Fossa)
 --------------------------
