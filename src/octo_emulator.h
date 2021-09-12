@@ -282,6 +282,8 @@ typedef struct {
   char     hires;        // in SCHIP 128x64 mode?
   uint8_t  flags[8];     // SCHIP flag variables
   uint8_t  pattern[16];  // XO-CHIP audio pattern
+  uint8_t  pitch;        // XO-CHIP audio pitch
+  double   osc;          // XO-CHIP audio oscillator offset
   int      plane;        // XO-CHIP graphics plane
   long     ticks;        // how many cycles have been executed?
   int      had_sound;    // was audio played in the last batch of instructions?
@@ -306,6 +308,8 @@ void octo_emulator_init(octo_emulator* e, char* rom, size_t romsize, octo_option
   e->pc=0x200;
   e->plane=1;
   e->pending=-1;
+  e->pitch=64;
+  e->osc=0;
   memcpy(e->ram+0x200,rom,romsize);
   memcpy(e->ram,     octo_font_sets[e->options.font][0], 5*16);
   memcpy(e->ram+5*16,octo_font_sets[e->options.font][1],10*16);
@@ -390,6 +394,7 @@ void octo_emulator_misc(octo_emulator*e, int x, int op){
     case 0x29: e->i= 5*(e->v[x]&0xF);                                                                 break;
     case 0x30: e->i=10*(e->v[x]&0xF)+(5*16);                                                          break;
     case 0x33: octo_set(e,0,(e->v[x]/100)%10),octo_set(e,1,(e->v[x]/10)%10),octo_set(e,2,e->v[x]%10); break;
+    case 0x3A: e->pitch=e->v[x];                                                                      break;
     case 0x55: for(int z=0;z<=x;z++)octo_set(e,z,e->v[z]); if(!e->options.q_loadstore)e->i+=x+1;      break;
     case 0x65: for(int z=0;z<=x;z++)e->v[z]=octo_get(e,z); if(!e->options.q_loadstore)e->i+=x+1;      break;
     case 0x75: for(int z=0;z<=(0x7&x);z++)e->flags[z]=e->v[z];                                        break;

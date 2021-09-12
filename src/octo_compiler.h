@@ -421,7 +421,7 @@ char* octo_reserved_words[]={
   "save","load","buzzer","if","then","begin","else","end","jump","jump0",
   "native","sprite","loop","while","again","scroll-down","scroll-up","scroll-right","scroll-left",
   "lores","hires","loadflags","saveflags","i","audio","plane",":macro",":calc",":byte",
-  ":call",":stringmode",":assert",":monitor",":pointer",
+  ":call",":stringmode",":assert",":monitor",":pointer","pitch",
 };
 int octo_is_reserved(char*name){
   for(size_t z=0;z<sizeof(octo_reserved_words)/sizeof(char*);z++)if(strcmp(name,octo_reserved_words[z])==0)return 1;
@@ -905,6 +905,7 @@ void octo_compile_statement(octo_program*p){
   else if(octo_match(p,"bcd"))          octo_instruction(p, 0xF0|octo_register(p), 0x33);
   else if(octo_match(p,"delay"))        octo_expect(p,":="),octo_instruction(p, 0xF0|octo_register(p), 0x15);
   else if(octo_match(p,"buzzer"))       octo_expect(p,":="),octo_instruction(p, 0xF0|octo_register(p), 0x18);
+  else if(octo_match(p,"pitch"))        octo_expect(p,":="),octo_instruction(p, 0xF0|octo_register(p), 0x3A);
   else if(octo_match(p,"jump0"))        octo_immediate(p, 0xB0, octo_value_12bit(p));
   else if(octo_match(p,"jump"))         octo_immediate(p, 0x10, octo_value_12bit(p));
   else if(octo_match(p,"native"))       octo_immediate(p, 0x00, octo_value_12bit(p));

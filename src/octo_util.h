@@ -968,19 +968,25 @@ void octo_load_config(octo_ui_config*ui,octo_options*o){
 *
 **/
 
-#define AUDIO_FRAG_SIZE 256
+#define AUDIO_FRAG_SIZE 1024
+#define AUDIO_SAMPLE_RATE (4096*8)
 
 SDL_AudioSpec audio;
 
 void audio_pump(void*user,Uint8*stream,int len){
   octo_emulator*emu=user;
-  for(int z=0;z<len;z++) stream[z]=!emu->had_sound?audio.silence: (emu->pattern[(z/8)%16]>>(7-(z%8)))&1?ui.volume: audio.silence;
+  double freq=4000*pow(2,(emu->pitch-64)/48.0);
+  for(int z=0;z<len;z++){
+    int ip=emu->osc;
+    stream[z]=!emu->had_sound?audio.silence: (emu->pattern[ip>>3]>>((ip&7)^7))&1?ui.volume: audio.silence;
+    emu->osc=fmod(emu->osc+(freq/AUDIO_SAMPLE_RATE),128.0);
+  }
   emu->had_sound=0;
 }
 
 void audio_init(octo_emulator*emu){
   SDL_memset(&audio,0,sizeof(audio));
-  audio.freq=4096;
+  audio.freq=AUDIO_SAMPLE_RATE;
   audio.format=AUDIO_S8;
   audio.channels=1;
   audio.samples=AUDIO_FRAG_SIZE;

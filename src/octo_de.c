@@ -26,7 +26,6 @@
 #define MODE_SAVE_OVERWRITE 10
 
 #define LEGEND_SPACE 16
-#define AUDIO_FRAG_SIZE 256
 
 #ifndef VERSION
 #define VERSION "1.1w"
