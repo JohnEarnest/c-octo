@@ -1591,7 +1591,7 @@ int main(int argc,char*argv[]){
         if(input.events[EVENT_ESCAPE])state.mode=MODE_TEXT_EDITOR;
         if(input.events[EVENT_TOGGLE_MONITORS])ui.show_monitors=!ui.show_monitors;
         if(emu.halt){
-          if(input.events[EVENT_INTERRUPT])emu.halt=0;
+          if(input.events[EVENT_INTERRUPT])emu.halt=0,octo_ui_invalidate(&emu);
           if(input.events[EVENT_STEP]){
             emu.dt=emu.st=0;octo_emulator_instruction(&emu);snprintf(emu.halt_message,sizeof(emu.halt_message),"Single Stepping");
           }

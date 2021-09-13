@@ -726,6 +726,7 @@ void octo_ui_monitors(octo_emulator*emu,octo_program*prog){
   }
 }
 
+void octo_ui_invalidate(octo_emulator*emu){emu->ppx[0]^=0xFF;}
 void octo_ui_run(octo_emulator*emu,octo_program*prog,octo_ui_config*ui,SDL_Window*win,SDL_Renderer*ren,SDL_Texture*screen,SDL_Texture*overlay){
   // drop repaints if the display hasn't changed
   int dirty=memcmp(emu->px,emu->ppx,sizeof(emu->px))!=0, debug=emu->halt||ui->show_monitors;
