@@ -1,7 +1,7 @@
 
 DESTDIR=""
 PREFIX="/usr/local"
-VERSION="1.1"
+VERSION="1.2"
 INSTALLDIR=$(DESTDIR)$(PREFIX)/bin/
 SDL=$(shell sdl2-config --cflags --libs)
 UNAME=$(shell uname)

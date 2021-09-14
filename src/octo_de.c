@@ -28,7 +28,7 @@
 #define LEGEND_SPACE 16
 
 #ifndef VERSION
-#define VERSION "1.1w"
+#define VERSION "1.2w"
 #endif
 
 char*default_program=
