@@ -1,7 +1,37 @@
 C-Octo Build Guide
 ==================
 This document collects information about building and using C-Octo on various host operating systems and devices.
-Start by obtaining a copy of the c-octo repository and navigating to its root via your favorite terminal application.
+Start by [obtaining a copy of the c-octo repository](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository#about-cloning-a-repository) and navigating to its root via your favorite terminal application.
+
+Raspberry Pi OS / Raspbian / Debian
+-----------------------------------
+Install SDL2 and its dev package.
+```
+sudo apt update
+sudo apt install libsdl2-2.0-0 libsdl2-dev 
+```
+You need to install the dev package even though libsdl2-2.0-0 may come pre-installed. If you do not, you will get build errors referring to a missing `SDL.h`.
+
+You can then use the Makefile to build and install:
+```
+make && sudo make install
+```
+
+Using `sudo make install` seperately from `make` may produce errors. If you aren't sure of what you're doing, run both as listed above.
+
+If you are on a Raspberry Pi and see slow performance with default settings, try setting `ui.software_render=1` in `~/.octo.rc`. Some hardware & driver combinations have poor hardware draw performance. Setting rendering to software mode may compensate for it.
+
+Ubuntu 20.04 (Focal Fossa)
+--------------------------
+
+Some Ubuntu variants do not ship with build tools. Make sure they are installed using the following commands:
+```
+sudo apt update
+sudo apt install build-essential git manpages-dev
+```
+This may take a bit depending on the speeds of your connection and boot medium. 
+
+Afterward, follow the steps for Raspberry Pi OS / Debian. The package names are the same for SDL.
 
 MacOS X
 -------
@@ -15,7 +45,7 @@ You can then use the Makefile to build and install:
 make && sudo make install
 ```
 
-The same procedure, modulo the choice of package manager, will work on most Linux distros.
+
 
 Windows (MinGW)
 ---------------
