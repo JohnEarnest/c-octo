@@ -280,7 +280,7 @@ typedef struct {
   uint8_t  dt;           // delay timer
   uint8_t  st;           // sound timer
   char     hires;        // in SCHIP 128x64 mode?
-  uint8_t  flags[8];     // SCHIP flag variables
+  uint8_t  flags[16];    // SCHIP flag variables
   uint8_t  pattern[16];  // XO-CHIP audio pattern
   uint8_t  pitch;        // XO-CHIP audio pitch
   double   osc;          // XO-CHIP audio oscillator offset
@@ -304,7 +304,7 @@ void octo_emulator_init(octo_emulator* e, char* rom, size_t romsize, octo_option
   memset(e,0,sizeof(octo_emulator));
   memset(e->ppx,-1,sizeof(e->ppx));
   if (options!=NULL) memcpy(&e->options,options,sizeof(octo_options)); else octo_default_options(&e->options);
-  if (flags  !=NULL) memcpy(&e->flags,flags,8);
+  if (flags  !=NULL) memcpy(&e->flags,flags,16);
   e->pc=0x200;
   e->plane=1;
   e->pending=-1;
@@ -397,8 +397,8 @@ void octo_emulator_misc(octo_emulator*e, int x, int op){
     case 0x3A: e->pitch=e->v[x];                                                                      break;
     case 0x55: for(int z=0;z<=x;z++)octo_set(e,z,e->v[z]); if(!e->options.q_loadstore)e->i+=x+1;      break;
     case 0x65: for(int z=0;z<=x;z++)e->v[z]=octo_get(e,z); if(!e->options.q_loadstore)e->i+=x+1;      break;
-    case 0x75: for(int z=0;z<=(0x7&x);z++)e->flags[z]=e->v[z];                                        break;
-    case 0x85: for(int z=0;z<=(0x7&x);z++)e->v[z]=e->flags[z];                                        break;
+    case 0x75: for(int z=0;z<=(0xF&x);z++)e->flags[z]=e->v[z];                                        break;
+    case 0x85: for(int z=0;z<=(0xF&x);z++)e->v[z]=e->flags[z];                                        break;
     default: e->halt=1, snprintf(e->halt_message,OCTO_HALT_MAX,"Unknown Misc Opcode 0xF%X%0X",x,op);
   }
 }

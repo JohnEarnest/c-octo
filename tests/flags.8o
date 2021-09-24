@@ -1,0 +1,3 @@
+: main
+	loadflags v9
+	saveflags vf

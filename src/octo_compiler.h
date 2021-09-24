@@ -925,16 +925,8 @@ void octo_compile_statement(octo_program*p){
     if(n>3) p->is_error=1, snprintf(p->error,OCTO_ERR_MAX,"The plane bitmask must be [0,3], was %d.",n);
     octo_instruction(p, 0xF0|n, 0x01);
   }
-  else if(octo_match(p,"saveflags")){
-    int n=octo_register(p);
-    if(n>7){p->is_error=1;snprintf(p->error,OCTO_ERR_MAX,"Argument to saveflags must be v[0,7].");}
-    octo_instruction(p, 0xF0|n, 0x75);
-  }
-  else if(octo_match(p,"loadflags")){
-    int n=octo_register(p);
-    if(n>7){p->is_error=1;snprintf(p->error,OCTO_ERR_MAX,"Argument to loadflags must be v[0,7].");}
-    octo_instruction(p, 0xF0|n, 0x85);
-  }
+  else if(octo_match(p,"saveflags"))octo_instruction(p, 0xF0|octo_register(p), 0x75);
+  else if(octo_match(p,"loadflags"))octo_instruction(p, 0xF0|octo_register(p), 0x85);
   else if(octo_match(p,"save")){
     int r=octo_register(p);
     if(octo_match(p,"-")) octo_instruction(p, 0x50|r, (octo_register(p)<<4)|0x02);
