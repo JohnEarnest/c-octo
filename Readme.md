@@ -78,6 +78,6 @@ Octo-run and Octode look for a file named `.octo.rc` in the user's home director
 - `quirks.jump0`: if `1`, emulate a buggy behavior of SCHIP on the HP-48: the 4 high bits of the target address of `jump0` determines the offset register used (instead of always `v0`).
 - `quirks.logic`: if `1`, clear `vf` after `&=`,`|=` and `^=`. On the VIP, these instructions leave `vf` in an unknown state.
 - `quirks.clip`: if `1`, do not "wrap" sprite drawing around the edges of the display.
-- `wuirks.vblank`: if `1`, drawing a sprite will block until the end of the 60hz frame, like the VIP.
+- `quirks.vblank`: if `1`, drawing a sprite will block until the end of the 60hz frame, like the VIP.
 
 All colors are specified as 6-digit RGB in hexadecimal, like `996600`. The default quirks settings, palette, and other options correspond to those of web-octo.
