@@ -428,7 +428,8 @@ input_events input={0,-1,-1,0,-1,-1,0,{0},0};
 void events_queue(SDL_Event*e){
   if(e->type==SDL_KEYDOWN){
     int code=e->key.keysym.sym;
-    if(code==SDLK_LSHIFT||code==SDLK_RSHIFT)input.is_shifted++;
+    if(code==SDLK_LSHIFT)input.is_shifted|=1;
+    if(code==SDLK_RSHIFT)input.is_shifted|=2;
   }
   if(e->type==SDL_KEYUP){
     int code =e->key.keysym.sym;
@@ -467,7 +468,8 @@ void events_queue(SDL_Event*e){
     if(code==SDLK_HOME)input.events[EVENT_HOME]=1;
     if(code==SDLK_END )input.events[EVENT_END ]=1;
     if(code==SDLK_b&&cmd)input.events[EVENT_FULLSCREEN]=1;
-    if(code==SDLK_LSHIFT||code==SDLK_RSHIFT)input.is_shifted--;
+    if(code==SDLK_LSHIFT)input.is_shifted&=~1;
+    if(code==SDLK_RSHIFT)input.is_shifted&=~2;
     if(code==SDLK_i)input.events[EVENT_INTERRUPT]=1;
     if(code==SDLK_o)input.events[EVENT_STEP]=1;
     if(code==SDLK_m)input.events[EVENT_TOGGLE_MONITORS]=1;
