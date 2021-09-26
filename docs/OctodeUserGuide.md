@@ -15,6 +15,7 @@ The Text Editor is the heart of developing Octo programs, and your jumping-off p
 The following keyboard shortcuts are available:
 
 - Arrow keys move the cursor by one character.
+- `Ctrl`+Arrow keys move the cursor by entire spans of characters or whitespace.
 - `Home`/`End` move the cursor to the beginning or end of the line, respectively.
 - `PageUp`/`PageDown` move the cursor vertically by a screenful.
 - Holding `Shift` while using arrow keys, `Home`, `End`, `PageUp`, or `PageDown` will select a region of text.

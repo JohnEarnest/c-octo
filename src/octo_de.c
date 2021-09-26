@@ -298,6 +298,7 @@ void text_apply_edit(text_span*from,text_span*to,char*text,int keep_sel){
       octo_list_insert(&state.text_lines,rest,row+1);
       row++; col=0;
     }
+    else if(c=='\r'){}
     else{line_insert(line,col++,c=='\t'?' ': c<' '?'@': c>'~'?'@': c);}
   }
   to->start.row=from->start.row, to->start.col=from->start.col, to->end.row=row, to->end.col=col;
@@ -367,6 +368,7 @@ void text_import(char*text){
   if((unsigned char)text[0]==0xEF&&(unsigned char)text[1]==0xBB&&(unsigned char)text[2]==0xBF)text+=3; // UTF-8 BOM
   while((c=*text++)){
     if     (c=='\n'){octo_list_append(&state.text_lines,(l=line_create()));}
+    else if(c=='\r'){}
     else if(c=='\t'){line_insert(l,l->count,' ');}
     else            {line_insert(l,l->count,c<' '?'@': c>'~'?'@': c);}
   }
@@ -419,6 +421,41 @@ void text_end_find(){
   state.text_find=0;
   text_movecursor(0,0);
 }
+int text_peek(text_pos*pos){
+  if(pos->row>=0&&pos->row<state.text_lines.count){
+    text_line*line=octo_list_get(&state.text_lines,pos->row);
+    if(pos->col>=0&&pos->col<line->count) return line_get(line,pos->col);
+    else if(pos->col==line->count)        return '\n';
+  }
+  return -1;
+}
+int text_prevpos(text_pos*pos){
+  if(pos->row==0&&pos->col==0)return 0;
+  if(!pos->col--)--pos->row,pos->col=((text_line*)octo_list_get(&state.text_lines,pos->row))->count;
+  return 1;
+}
+int text_nextpos(text_pos*pos){
+  text_line*line=octo_list_get(&state.text_lines,pos->row);
+  if(pos->row==state.text_lines.count-1&&pos->col==line->count)return 0;
+  if(pos->col++==line->count)++pos->row,pos->col=0;
+  return 1;
+}
+text_pos text_scanw(text_pos from,int dir){
+  text_pos pos=from;
+  if(dir<0){
+    if(text_prevpos(&pos)){
+      from=pos;
+      int wantspace=isspace(text_peek(&pos));
+      while(text_prevpos(&pos)&&!(wantspace^isspace(text_peek(&pos))))from=pos;
+    }
+  }
+  else{
+    int wantspace=isspace(text_peek(&pos));
+    while(text_nextpos(&pos)&&!(wantspace^isspace(text_peek(&pos))))from=pos;
+    from=pos;
+  }
+  return from;
+}
 void find_events(SDL_Event*e){
   size_t len=strlen(state.text_find_str);
   if(e->type==SDL_TEXTINPUT){
@@ -454,6 +491,7 @@ void edit_events(SDL_Event*e){
   }
   if(e->type==SDL_KEYDOWN){
     int code=e->key.keysym.sym;
+    int mod=e->key.keysym.mod&(KMOD_LCTRL|KMOD_RCTRL|KMOD_LGUI|KMOD_RGUI);
     if(code==SDLK_RETURN){
       text_new_edit(&span,stralloc("\n"),0);
     }
@@ -487,11 +525,19 @@ void edit_events(SDL_Event*e){
       else{text_movecursor(0,1);}
     }
     if(code==SDLK_LEFT){
-      if(head->col==0&&head->row>0){text_setcursor(prevline->count,head->row-1);}
+      if(mod){
+        text_pos new_pos=text_scanw(*head,-1);
+        text_setcursor(new_pos.col, new_pos.row);
+      }
+      else if(head->col==0&&head->row>0){text_setcursor(prevline->count,head->row-1);}
       else{text_movecursor(-1,0);}
     }
     if(code==SDLK_RIGHT){
-      if(head->col==headline->count&&head->row<state.text_lines.count-1){text_setcursor(0,head->row+1);}
+      if(mod){
+        text_pos new_pos=text_scanw(*head,1);
+        text_setcursor(new_pos.col, new_pos.row);
+      }
+      else if(head->col==headline->count&&head->row<state.text_lines.count-1){text_setcursor(0,head->row+1);}
       else{text_movecursor(1,0);}
     }
   }
@@ -596,7 +642,7 @@ void render_text_editor(){
     }
     if(input.events[EVENT_PASTE]){
       char*text=SDL_GetClipboardText();
-      if(text!=NULL&&strlen(text)>=1){
+      if(text!=NULL&&*text){
         int len=strlen(text);
         text_span span=get_ordered_cursor();
         text_new_edit(&span,stralloc(text),1);
