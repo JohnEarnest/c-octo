@@ -37,8 +37,9 @@ int main(int argc, char* argv[]){
 
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO);
   SDL_Window  *win=SDL_CreateWindow("Octo-Run",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,ui.win_width*ui.win_scale,ui.win_height*ui.win_scale,SDL_WINDOW_SHOWN);
-  SDL_Renderer*ren=SDL_CreateRenderer(win,-1, ui.software_render?SDL_RENDERER_SOFTWARE:SDL_RENDERER_ACCELERATED);
-  SDL_Texture *screen=SDL_CreateTexture(ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,128,128); // oversized for rotation
+  SDL_Renderer*ren=NULL;
+  SDL_Texture*screen=NULL;
+  octo_ui_init(win,&ren,&screen);
   SDL_Texture *overlay=NULL;
   SDL_SetWindowFullscreen(win,ui.windowed?0:SDL_WINDOW_FULLSCREEN_DESKTOP);
   SDL_AddTimer((1000/60),tick,NULL);
@@ -49,6 +50,10 @@ int main(int argc, char* argv[]){
   SDL_Event e;
   while(SDL_WaitEvent(&e)){
     if(e.type==SDL_QUIT)break;
+    if(e.type==SDL_RENDER_DEVICE_RESET||e.type==SDL_RENDER_TARGETS_RESET){
+      SDL_DestroyTexture(overlay),overlay=NULL;
+      octo_ui_init(win,&ren,&screen);
+    }
     events_joystick(&emu,&joy,&e);
     if(e.type==SDL_KEYDOWN){
       int code=e.key.keysym.sym;
