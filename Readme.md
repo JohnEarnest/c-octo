@@ -39,10 +39,12 @@ Octo-Run
 ```
 $octo-run
 octo-run v1.0
-usage: ./octo-run <source>
+usage: ./octo-run <source> [-c <path>]
 where <source> is a .ch8 or .8o
 ```
 Octo-run will execute a `.ch8` binary or compile and run an Octo program. While executing, the same basic debugging features are available as in web-octo: `i` toggles a user interrupt and the display of the register file, `o` single-steps while interrupted, and `m` toggles the display of memory monitors, if any are registered. Command-F or Ctrl-F toggle fullscreen mode and Escape or backtick quit.
+
+If provided, the `-c` flag may be used to indicate a configuration file which should override the global `.octo.rc` file. This makes it easier to configure colors, speed, and other options for an individual program while working on multiple projects.
 
 If a gamepad is detected, axes will be mapped to mirror `A`,`S`,`W`, and `D` on the keyboard and buttons will similarly be mapped to `E` and `Q`.
 

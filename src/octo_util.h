@@ -903,14 +903,7 @@ void octo_path_list(octo_list* results, char* path) {
 *
 **/
 
-void octo_load_config(octo_ui_config*ui,octo_options*o){
-  ui->windowed=1, ui->software_render=0, ui->win_width=480, ui->win_height=272, ui->win_scale=2, ui->volume=20;
-  ui->show_monitors=0;
-  octo_default_options(o);
-
-  char config_path[OCTO_PATH_MAX];
-  octo_path_home(config_path);
-  octo_path_append(config_path,".octo.rc");
+void octo_load_config(octo_ui_config*ui,octo_options*o,const char*config_path){
   FILE*conf=fopen(config_path,"rb");
   if(conf==NULL){printf("unable to open %s\n",config_path);return;}
   char line[256];
@@ -967,6 +960,16 @@ void octo_load_config(octo_ui_config*ui,octo_options*o){
     }
   }
   fclose(conf);
+}
+
+void octo_load_config_default(octo_ui_config*ui,octo_options*o){
+  ui->windowed=1, ui->software_render=0, ui->win_width=480, ui->win_height=272, ui->win_scale=2, ui->volume=20;
+  ui->show_monitors=0;
+  char config_path[OCTO_PATH_MAX];
+  octo_path_home(config_path);
+  octo_path_append(config_path,".octo.rc");
+  octo_default_options(o);
+  octo_load_config(ui,o,config_path);
 }
 
 /**
@@ -1028,9 +1031,10 @@ void emu_step(octo_emulator*emu,octo_program*prog){
 *
 **/
 
-void octo_load_program(octo_ui_config*ui,octo_emulator*emu,octo_program**prog,const char* filename){
+void octo_load_program(octo_ui_config*ui,octo_emulator*emu,octo_program**prog,const char* filename,const char* options){
   octo_options defaults;
-  octo_load_config(ui,&defaults);
+  octo_load_config_default(ui,&defaults);
+  if(options)octo_load_config(ui,&defaults,options);
   char*source;
   struct stat st;
   if(stat(filename,&st)!=0){

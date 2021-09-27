@@ -1568,7 +1568,7 @@ void render(){
 
 int main(int argc,char*argv[]){
   (void)argc,(void)argv;
-  octo_load_config(&ui,&defaults);
+  octo_load_config_default(&ui,&defaults);
 
   octo_list_init(&state.text_lines);
   snprintf(state.text_status,sizeof(state.text_status),"Octode v"VERSION" Ready.");state.text_err=0;

@@ -28,12 +28,20 @@ octo_program* prog=NULL;
 octo_emulator emu;
 
 int main(int argc, char* argv[]){
-  if(argc<2){
+  char*source_path=NULL,*options_path=NULL;
+  for(int z=1;z<argc;z++){
+    if(strcmp(argv[z],"-c")==0){
+      if(z+1>=argc){printf("no config file path specified for -c.\n");return 1;}
+      options_path=argv[++z];
+    }
+    else{source_path=argv[z];}
+  }
+  if(source_path==NULL){
     printf("octo-run v%s\n",VERSION);
-    printf("usage: %s <source>\nwhere <source> is a .ch8 or .8o\n",argv[0]);
+    printf("usage: %s <source> [-c <path>]\nwhere <source> is a .ch8 or .8o\n-c : specify a path to an override config file.\n",argv[0]);
     return 0;
   }
-  octo_load_program(&ui,&emu,&prog,argv[1]);
+  octo_load_program(&ui,&emu,&prog,source_path,options_path);
 
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO);
   SDL_Window  *win=SDL_CreateWindow("Octo-Run",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,ui.win_width*ui.win_scale,ui.win_height*ui.win_scale,SDL_WINDOW_SHOWN);
