@@ -728,6 +728,13 @@ void octo_ui_monitors(octo_emulator*emu,octo_program*prog){
   }
 }
 
+void octo_ui_init(SDL_Window*win,SDL_Renderer**ren,SDL_Texture**screen){
+  if(*screen)SDL_DestroyTexture(*screen);
+  if(*ren)SDL_DestroyRenderer(*ren);
+  *ren=SDL_CreateRenderer(win,-1, ui.software_render?SDL_RENDERER_SOFTWARE:SDL_RENDERER_ACCELERATED);
+  *screen=SDL_CreateTexture(*ren,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING,128,128); // oversized for rotation
+}
+
 void octo_ui_invalidate(octo_emulator*emu){emu->ppx[0]^=0xFF;}
 void octo_ui_run(octo_emulator*emu,octo_program*prog,octo_ui_config*ui,SDL_Window*win,SDL_Renderer*ren,SDL_Texture*screen,SDL_Texture*overlay){
   // drop repaints if the display hasn't changed
@@ -767,11 +774,8 @@ void octo_ui_run(octo_emulator*emu,octo_program*prog,octo_ui_config*ui,SDL_Windo
 }
 
 Uint32 tick(Uint32 interval,void*param){
-  SDL_Event e;
-  SDL_UserEvent u;
-  u.type=e.type=SDL_USEREVENT;
-  u.data1=param;
-  e.user=u;
+  SDL_Event e={SDL_USEREVENT};
+  e.user.data1=param;
   SDL_PushEvent(&e);
   return interval;
 }
