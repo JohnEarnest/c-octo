@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.21)
 
 project(c-octo VERSION 1.2 LANGUAGES C)
 
-if(NOT WIN32)
+if(WIN32)
+  set(INSTALLDIR .)
+else()
   set(INSTALLDIR bin)
 endif()
 
@@ -16,7 +18,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 if(MSVC)
-  add_compile_options(/Wall) #MSVC uses /Wall as the highest warning level, includes /W4 and more. 
+  add_compile_options(/Wall) # MSVC uses /Wall as the highest warning level, includes /W4 and more.
   #add_compile_options(/Wall /WX) # MSVC reports multiple errors that presumably other platforms don't, /WX is the equivalent to -Werror but means builds cannot complete under MSVC with an equivalent to the provided Makefile
 else()
   add_compile_options(-Wall -Werror -Wextra)
@@ -38,6 +40,11 @@ if(SDL2_FOUND)
   add_executable(octo-de src/octo_de.c)
   target_link_libraries(octo-de PRIVATE SDL2::SDL2 SDL2::SDL2main)
   install(TARGETS octo-cli octo-run octo-de DESTINATION ${INSTALLDIR})
+
+  if(MSVC)
+    # default is to dynamically link SDL2, MSVC copies the file to the build directory but we need to copy it on to the install directory manually.
+    install(FILES ${CMAKE_BINARY_DIR}/SDL2$<$<CONFIG:Debug>:d>.dll DESTINATION ${INSTALLDIR})
+  endif()
 else()
   message("SDL2 could not be found, only Octo-cli will be built.")
   install(TARGETS octo-cli DESTINATION ${INSTALLDIR})
