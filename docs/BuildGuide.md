@@ -64,8 +64,11 @@ cp octo.rc ~/.octo.rc
 
 Windows (MSVC)
 --------------
-Install SDL2 somewhere convenient, and create a project which links against and includes it appropriately:
+Recent versions of Visual Studio (2017 or later) will recognise the CMakeLists.txt file and generate a project when opening the c-octo directory. 64 bit configurations are provided by default, if performing a 32 bit build instead you'll need to install the x86 target (if using vcpkg)
 
+If you wish to use `octo-de` or `octo-run` you will need to install SDL2. Using [vcpkg](https://vcpkg.io/) with the visual studio integration makes the build process fairly seamless (follow [the vcpkg getting startd guide](https://vcpkg.io/en/getting-started.html) then run `vcpkg install SDL2:x64-windows`), otherwise you will need to ensure SDL2 is known to CMake.
+
+If you're using an older version of the IDE that doesn't support CMake you'll need to install SDL2 somewhere convenient, then create a project which links against and includes it appropriately:
 - Project -> Properties -> Configuration Properties -> VC++ Directories -> Include Directories -> Edit -> add the path to the `include`s.
 - Project -> Properties -> Configuration Properties -> VC++ Directories -> Library Directories -> Edit -> add the path to the `libs`.
 - Project -> Properties -> Configuration Properties -> C/C++ -> Preprocessor -> add `_CRT_SECURE_NO_WARNINGS;` to suppress complaints about using `fopen()`.
