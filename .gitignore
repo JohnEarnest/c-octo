@@ -1,3 +1,5 @@
 build/*
 leftovers/*
 **/.DS_Store
+.vs/*
+out/*
