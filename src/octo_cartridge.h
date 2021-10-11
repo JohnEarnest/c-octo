@@ -266,7 +266,7 @@ void octo_json_get_str(octo_str*s,octo_str*dest){
     octo_str_append(dest,
       octo_str_match(s,"\\\"")?'"':
       octo_str_match(s,"\\\\")?'\\':
-      octo_str_match(s,"/")?'/':
+      octo_str_match(s,"\\/")?'/':
       octo_str_match(s,"\\b")?'\b':
       octo_str_match(s,"\\f")?'\f':
       octo_str_match(s,"\\n")?'\n':
@@ -704,7 +704,7 @@ void octo_cart_save(FILE*dest,char*program,octo_options*o,char*label_pix,char*la
     octo_list_append(&cart->frames,frame);
     frame->data=malloc(frame_size);
     for(int i=0;i<frame_size;i++){
-      int src=(i+frame_count*z)/2;                             // every byte in the payload becomes 2 pixels
+      int src=(i+frame_size*z)/2;                              // every byte in the payload becomes 2 pixels
       int nyb=src>=json.pos?0: (json.root[src]>>(i%2==0?4:0)); // alternate high, low nybbles
       frame->data[i]=(base_frame->data[i]*16)+(nyb&0xF);       // multiply out colors and mix in data
     }
