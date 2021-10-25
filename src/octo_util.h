@@ -6,6 +6,8 @@
 *  used by octo-run and octo-de.
 *
 **/
+#include <time.h>  // time()
+#include <stdlib.h> // srand()
 
 #define MAX(a,b)          (a>b?a:b)
 #define BLACK             0xFF000000
@@ -1023,6 +1025,10 @@ void emu_step(octo_emulator*emu,octo_program*prog){
   }
   if(emu->dt>0)emu->dt--;
   if(emu->st>0)emu->st--,emu->had_sound=1;
+}
+
+void random_init() {
+  srand(time(NULL));
 }
 
 /**
