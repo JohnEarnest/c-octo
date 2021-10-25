@@ -1602,6 +1602,7 @@ int main(int argc,char*argv[]){
   SDL_JoystickEventState(SDL_ENABLE);
   SDL_Joystick*joy=NULL;
   audio_init(&emu);
+  random_init();
 
   SDL_Event e; state.running=1;
   while(state.running&&SDL_WaitEvent(&e)){
