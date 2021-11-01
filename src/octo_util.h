@@ -952,6 +952,12 @@ void octo_load_config(octo_ui_config*ui,octo_options*o,const char*config_path){
                     strcmp(value,"gamepad"   )==0?OCTO_TOUCH_GAMEPAD:
                     strcmp(value,"vip"       )==0?OCTO_TOUCH_VIP: OCTO_TOUCH_NONE;
     }
+    if(strcmp(key,"quirks.shift"    )==0)o->q_shift    =atoi(value)!=0;
+    if(strcmp(key,"quirks.loadstore")==0)o->q_loadstore=atoi(value)!=0;
+    if(strcmp(key,"quirks.jump0"    )==0)o->q_jump0    =atoi(value)!=0;
+    if(strcmp(key,"quirks.logic"    )==0)o->q_logic    =atoi(value)!=0;
+    if(strcmp(key,"quirks.clip"     )==0)o->q_clip     =atoi(value)!=0;
+    if(strcmp(key,"quirks.vblank"   )==0)o->q_vblank   =atoi(value)!=0;
     char* colors[OCTO_PALETTE_SIZE]={"color.plane0","color.plane1","color.plane2","color.plane3","color.background","color.sound"};
     for(int z=0;z<OCTO_PALETTE_SIZE;z++){
       if(strcmp(key,colors[z])==0){
