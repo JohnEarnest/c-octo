@@ -583,9 +583,10 @@ octo_const* octo_value_constant(octo_program*p){
   return octo_value_fail(p,"a constant",n,1), octo_make_const(0,0);
 }
 
-void octo_macro_body(octo_program*p,octo_macro*m){
+void octo_macro_body(octo_program*p,char*desc,char*name,octo_macro*m){
   if(p->is_error)return;
   octo_expect(p,"{");
+  if(p->is_error){snprintf(p->error,OCTO_ERR_MAX,"Expected '{' for definition of %s '%s'.",desc,name);return;}
   int depth=1;
   while(!octo_is_end(p)){
     octo_tok*t=octo_peek(p);
@@ -595,6 +596,7 @@ void octo_macro_body(octo_program*p,octo_macro*m){
     octo_list_append(&m->body,octo_next(p));
   }
   octo_expect(p,"}");
+  if(p->is_error)snprintf(p->error,OCTO_ERR_MAX,"Expected '}' for definition of %s '%s'.",desc,name);
 }
 
 /**
@@ -1025,7 +1027,7 @@ void octo_compile_statement(octo_program*p){
     octo_macro*m=octo_make_macro();
     octo_map_set(&p->macros,n,m);
     while(!octo_is_end(p) && !octo_peek_match(p,"{",0)) octo_list_append(&m->args,octo_identifier(p,"macro argument"));
-    octo_macro_body(p,m);
+    octo_macro_body(p,"macro",n,m);
   }
   else if(octo_match(p,":stringmode")){
     char*n=octo_identifier(p,"stringmode");
@@ -1034,7 +1036,7 @@ void octo_compile_statement(octo_program*p){
     int alpha_base=p->source_pos, alpha_quote=octo_peek_char(p)=='"';
     char*alphabet=octo_string(p);
     octo_macro*m=octo_make_macro(); // every stringmode needs its own copy of this
-    octo_macro_body(p,m);
+    octo_macro_body(p,"string mode",n,m);
     for(int z=0;z<octo_interned_len(alphabet);z++){
       int c=0xFF&alphabet[z];
       if(s->modes[c]!=0){

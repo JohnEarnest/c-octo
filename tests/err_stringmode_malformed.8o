@@ -1,0 +1,12 @@
+
+# test malformed stringmode declarations per #13
+
+: font-5x3
+    0x60 0xA0 0xA0 0xA0 0xC0
+
+# omitted brackets containing index calculation 
+:stringmode text "0"
+
+: main
+	vF := key
+	jump main
