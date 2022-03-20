@@ -75,7 +75,10 @@ int main(int argc, char* argv[]){
         if(emu.wait){emu.v[(int)emu.wait_reg]=keys[z].v;emu.wait=0;}
       }
       if(code==SDLK_ESCAPE||code==SDLK_BACKQUOTE)break;
-      if(code==SDLK_m)ui.show_monitors=!ui.show_monitors;
+      if(code==SDLK_m){
+        if(ui.show_monitors) octo_ui_invalidate(&emu);
+        ui.show_monitors=!ui.show_monitors;
+      }
       if(emu.halt){
         if(code==SDLK_i)emu.halt=0,octo_ui_invalidate(&emu);
         if(code==SDLK_o){emu.dt=emu.st=0;octo_emulator_instruction(&emu);snprintf(emu.halt_message,OCTO_HALT_MAX,"Single Stepping");}
