@@ -28,9 +28,30 @@ Octo-CLI
 --------
 ```
 $octo-cli
-usage: ./octo-cli <source> [<destination>]
+usage: ./octo-cli <source> [<destination>] [-s <symfile>]
 ```
 The `source` file may be a `.8o` source file or a `.gif` octocart. If the `destination` has a `.ch8` extension, a CHIP-8 binary will be produced. If the destination has a `.gif` extension, an octocart will be produced. If the `destination` has a `.8o` extension, the source text of an input octocart will be extracted. If no destination is specified, the resultant `.ch8` binary will be piped to _stdout_.
+
+if the `-s` flag is provided, the compiler will write out a CSV file containing all the _symbols_ defined in the input program: breakpoints, constants (including labels), aliases, and monitors, for use with external debugging tools. For example:
+
+```
+$ cat symdemo.8o
+:monitor v6 8
+: main
+	:alias acc v2
+	acc += 1
+	:breakpoint "wait, then go"
+	acc := 0
+
+$ octo-cli symdemo.8o temp.ch8 -s syms.csv && cat syms.csv
+type,name,value
+breakpoint,"wait, then go",514
+constant,main,512
+alias,unpack-hi,0
+alias,unpack-lo,1
+alias,acc,2
+monitor,v6,8
+```
 
 The `make testcli` target will run a series of integration tests for this tool.
 
