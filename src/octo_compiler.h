@@ -61,7 +61,7 @@ void octo_list_insert(octo_list* list, void* item, int index) {
 }
 void* octo_list_remove(octo_list* list, int index) {
   void* ret=list->data[index];
-  for(int z=index;z<list->count;z++) list->data[z]=list->data[z+1];
+  for(int z=index;z<list->count-1;z++) list->data[z]=list->data[z+1];
   list->count--, list->data[list->count]=NULL; // paranoia
   return ret;
 }
@@ -878,7 +878,7 @@ void octo_compile_statement(octo_program*p){
     if(prev!=NULL)octo_free_reg(prev);
   }
   else if(octo_match(p,":byte")){
-    octo_append(p, octo_peek_match(p,"{",0)?octo_calculated(p,"ANONYMOUS"):octo_value_8bit(p));
+    octo_append(p, octo_peek_match(p,"{",0)?(int)octo_calculated(p,"ANONYMOUS"):octo_value_8bit(p));
   }
   else if(octo_match(p,":pointer")){
     int a=octo_peek_match(p,"{",0)?octo_calculated(p,"ANONYMOUS"):octo_value_16bit(p,1,0);
