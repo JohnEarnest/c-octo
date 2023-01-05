@@ -444,8 +444,8 @@ void octo_emulator_instruction(octo_emulator*e){
   if(op==0x00FE){e->hires=0, memset(e->px,0,sizeof(e->px));                                                  return;}
   if(op==0x00FF){e->hires=1, memset(e->px,0,sizeof(e->px));                                                  return;}
   if(op==0xF000){e->i=octo_emulator_word(e);                                                                 return;}
-  if((op&0xF0FF)==0xE09E){if( e->keys[(int)e->v[x]]) octo_emulator_skip(e);                                  return;}
-  if((op&0xF0FF)==0xE0A1){if(!e->keys[(int)e->v[x]]) octo_emulator_skip(e);                                  return;}
+  if((op&0xF0FF)==0xE09E){if(e->v[x]<=15&& e->keys[e->v[x]]) octo_emulator_skip(e);                          return;}
+  if((op&0xF0FF)==0xE0A1){if(e->v[x] >15||!e->keys[e->v[x]]) octo_emulator_skip(e);                          return;}
   if((op&0xF00F)==0x5002){for(int z=0;z<=abs(x-y);z++) octo_set(e,z,e->v[x<y?x+z:x-z]);                      return;}
   if((op&0xF00F)==0x5003){for(int z=0;z<=abs(x-y);z++) e->v[x<y?x+z:x-z]=octo_get(e,z);                      return;}
   if((op&0xFFF0)==0x00C0){for(int y=col-1;y>=0;y--)for(int x=0;x<row;x++)octo_emulator_move_pix(e,x,y,x,y-n);return;} // scroll down
