@@ -867,7 +867,7 @@ void render_config(){
   if(widget_optionbar(&o,"Cycles Per Frame",speeds,sizeof(speeds)/sizeof(char*),&s)){state.dirty=1;defaults.tickrate=speed_vals[s];}
   o.y+=o.h;
   int p=3, settings[][7]={
-    {0,0,1,0,1,1, 3215}, // vip
+    {0,0,1,0,1,1, 3232}, // vip
     {1,1,1,1,0,0, 3583}, // schip
     {0,0,0,0,0,0,65024}, // xo-chip
   };
@@ -882,7 +882,7 @@ void render_config(){
   }
   char* profiles[]={"VIP","SCHIP","XO-CHIP","Custom"};
   char* descs[]={
-    "Compatible with CHIP-8 on the COSMAC VIP. 3215b of RAM.",
+    "Compatible with CHIP-8 on the COSMAC VIP. 3232b of RAM.",
     "Compatible with SCHIP on the HP-48. 3583b of RAM.",
     "Compatible with Octo programs. 65024b of RAM.",
     "This cartridge has a custom configuration.",

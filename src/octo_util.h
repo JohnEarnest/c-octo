@@ -932,7 +932,7 @@ void octo_load_config(octo_ui_config*ui,octo_options*o,const char*config_path){
     if(strcmp(key,"core.tickrate")==0)o->tickrate=CLAMP(1,atoi(value),50000);
     if(strcmp(key,"core.max_rom" )==0){
       o->max_rom=atoi(value);
-      if(o->max_rom!=3216&&o->max_rom!=3583&&o->max_rom!=3584)o->max_rom=65024;
+      if(o->max_rom!=3232&&o->max_rom!=3583&&o->max_rom!=3584)o->max_rom=65024;
     }
     if(strcmp(key,"core.rotation")==0){
       o->rotation=atoi(value);

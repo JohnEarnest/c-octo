@@ -336,7 +336,7 @@ char* octo_cart_parse_json(octo_str*s,octo_options*o){
         }
         else if(strcmp(key.root,"maxSize")==0){
           o->max_rom=octo_json_get_int(s);
-          if(o->max_rom!=3216&&o->max_rom!=3583&&o->max_rom!=3584)o->max_rom=65024;
+          if(o->max_rom!=3232&&o->max_rom!=3583&&o->max_rom!=3584)o->max_rom=65024;
         }
         else if(strcmp(key.root,"touchInputMode")==0){
           octo_json_get_str(s,&val);

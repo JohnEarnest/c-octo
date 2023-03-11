@@ -38,7 +38,7 @@
 typedef struct {
   // core settings
   int tickrate;                  // {7,15,20,30,100,200,500,1000,10000,...}
-  int max_rom;                   // {3216, 3583, 3584, 65024}
+  int max_rom;                   // {3232, 3583, 3584, 65024}
   int rotation;                  // {0, 90, 180, 270}
   int font;                      // OCTO_FONT_...
   int touch_mode;                // OCTO_TOUCH_...
