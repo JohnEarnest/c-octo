@@ -175,10 +175,10 @@ octo_const* octo_make_const(double v,char m){octo_const*r=calloc(1,sizeof(octo_c
 octo_reg  * octo_make_reg  (int v)          {octo_reg  *r=calloc(1,sizeof(octo_reg  ));r->value=v;                                       return r;}
 octo_pref * octo_make_pref (int a,char l)   {octo_pref *r=calloc(1,sizeof(octo_pref ));r->value=a;r->is_long=l;                          return r;}
 octo_proto* octo_make_proto(int l,int p)    {octo_proto*r=calloc(1,sizeof(octo_proto));octo_list_init(&r->addrs);r->line=l,r->pos=p;     return r;}
-octo_macro* octo_make_macro()               {octo_macro*r=calloc(1,sizeof(octo_macro));octo_list_init(&r->args),octo_list_init(&r->body);return r;}
-octo_smode* octo_make_smode()               {octo_smode*r=calloc(1,sizeof(octo_smode));                                                  return r;}
+octo_macro* octo_make_macro(void)           {octo_macro*r=calloc(1,sizeof(octo_macro));octo_list_init(&r->args),octo_list_init(&r->body);return r;}
+octo_smode* octo_make_smode(void)           {octo_smode*r=calloc(1,sizeof(octo_smode));                                                  return r;}
 octo_flow * octo_make_flow (int a,int l,int p,char*t){octo_flow*r=calloc(1,sizeof(octo_flow));r->addr=a,r->line=l,r->pos=p,r->type=t;    return r;}
-octo_mon  * octo_make_mon  ()               {octo_mon  *r=calloc(1,sizeof(octo_mon  ));                                                  return r;}
+octo_mon  * octo_make_mon  (void)           {octo_mon  *r=calloc(1,sizeof(octo_mon  ));                                                  return r;}
 
 void octo_free_tok  (octo_tok  *x) {free(x);}
 void octo_free_const(octo_const*x) {free(x);}

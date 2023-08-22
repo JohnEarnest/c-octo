@@ -136,13 +136,13 @@ octo_program*prog=NULL;
 // horrible forward declarations:
 void import_text_to_pixel_editor(char*text);
 void text_setcursor(int x, int y);
-void save_file();
-void new_file();
+void save_file(void);
+void new_file(void);
 
 #define T_METRICS int ch=octo_mono_font.height+1,cw=octo_mono_font.maxwidth,cy=(th-4-(1+ch+1))/ch,cx=((tw-MENU_WIDTH-1)/cw)-2;
 
 #define TEXT_LINE_CHUNK 32
-text_line* line_create(){
+text_line* line_create(void){
   text_line*r=malloc(sizeof(text_line));
   return r->space=TEXT_LINE_CHUNK,r->root=malloc(r->space),r->cat_root=malloc(r->space),r->count=0,r;
 }
@@ -248,10 +248,10 @@ char* text_export_span(text_span*span){
   octo_str_append(&r,'\0');
   return r.root;
 }
-char* text_export_selection(){
+char* text_export_selection(void){
   return text_export_span(&state.text_cursor);
 }
-char* text_export(){
+char* text_export(void){
   octo_str r;
   octo_str_init(&r);
   for(int row=0;row<state.text_lines.count;row++){
@@ -327,13 +327,13 @@ void text_apply_edit(text_span*from,text_span*to,char*text,int keep_sel){
   }
   state.dirty=1;
 }
-void text_undo(){
+void text_undo(void){
   if(state.text_hist_index<=0)return;
   state.text_hist_index--;
   text_edit*edit=octo_list_get(&state.text_hist,state.text_hist_index);
   text_apply_edit(&edit->new_span,&edit->old_span,edit->old_data,edit->keep_sel);
 }
-void text_redo(){
+void text_redo(void){
   if(state.text_hist_index>=state.text_hist.count)return;
   text_edit*edit=octo_list_get(&state.text_hist,state.text_hist_index);
   state.text_hist_index++;
@@ -417,7 +417,7 @@ void text_movecursor(int dx, int dy){
   text_pos*head=&state.text_cursor.end;
   text_setcursor(head->col+dx, head->row+dy);
 }
-void text_end_find(){
+void text_end_find(void){
   state.text_find=0;
   text_movecursor(0,0);
 }
@@ -468,7 +468,7 @@ void find_events(SDL_Event*e){
     state.text_timer=0;
   }
 }
-text_span get_ordered_cursor(){
+text_span get_ordered_cursor(void){
   text_pos*head=&state.text_cursor.end;
   text_pos*tail=&state.text_cursor.start;
   text_pos*min=head->row<tail->row?head: head->row>tail->row?tail: head->col<tail->col?head: tail;
@@ -476,7 +476,7 @@ text_span get_ordered_cursor(){
   text_span span; span.start=*min; span.end=*max;
   return span;
 }
-text_span get_ordered_block(){
+text_span get_ordered_block(void){
   text_span span=get_ordered_cursor();
   span.start.col=0;
   text_line*line=octo_list_get(&state.text_lines,span.end.row);
@@ -542,7 +542,7 @@ void edit_events(SDL_Event*e){
     }
   }
 }
-void render_text_editor(){
+void render_text_editor(void){
   T_METRICS
   rect mb={tw-MENU_WIDTH,0,MENU_WIDTH,th/8};
   draw_vline(mb.x-1,0,th,WHITE);
@@ -804,17 +804,17 @@ void render_text_editor(){
 *
 **/
 
-void alert_cancel(){
+void alert_cancel(void){
   if     (state.mode==MODE_SAVE_OVERWRITE)state.mode=MODE_SAVE;
   else if(state.mode==MODE_NEW_UNSAVED   )state.mode=MODE_TEXT_EDITOR;
   else if(state.mode==MODE_QUIT_UNSAVED  )state.mode=MODE_TEXT_EDITOR;
 }
-void alert_confirm(){
+void alert_confirm(void){
   if     (state.mode==MODE_SAVE_OVERWRITE)save_file();
   else if(state.mode==MODE_NEW_UNSAVED   )new_file();
   else if(state.mode==MODE_QUIT_UNSAVED  )state.running=0;
 }
-void render_alert(){
+void render_alert(void){
   // MODE_NEW_UNSAVED | MODE_QUIT_UNSAVED | MODE_SAVE_OVERWRITE
   rect mb={0,0,MENU_WIDTH,th/4};
   draw_vline(mb.x+mb.w,0,th,WHITE);
@@ -852,7 +852,7 @@ void draw_preview_font_char(char*font,int xoff,int yoff,int w,int h,int c){
     PIX(px,py)=PIX(px+1,py)=PIX(px,py+1)=PIX(px+1,py+1)=colors[1];
   }
 }
-void render_config(){
+void render_config(void){
   rect mb={0,0,MENU_WIDTH,th/4};
   draw_vline(mb.x+mb.w,0,th,WHITE);
   widget_menuspacer(&mb);
@@ -934,7 +934,7 @@ int color_options[]={
   0x488bd4,0x78d7ff,0xb0fff1,0xfaffff,0xc7d4e1,0x928fb8,0x5b537d,0x392946,
 };
 
-void render_palette_editor(){
+void render_palette_editor(void){
   #define PAL_EDITOR_MARGIN 16
   rect mb={0,0,MENU_WIDTH,th/4};
   draw_vline(mb.x+mb.w,0,th,WHITE);
@@ -999,7 +999,7 @@ void render_palette_editor(){
 *
 **/
 
-void render_hex_dump(){
+void render_hex_dump(void){
   #define HEX_DUMP_MARGIN 16
   if(prog==NULL){state.mode=MODE_TEXT_EDITOR;return;}//sanity check
   int ch=octo_mono_font.height, cw=octo_mono_font.maxwidth;
@@ -1067,26 +1067,26 @@ void render_hex_dump(){
 *
 **/
 
-void clear_pixel_editor_hist(){
+void clear_pixel_editor_hist(void){
   state.sprite_hist_index=0;
   while(state.sprite_hist.count)free(octo_list_remove(&state.sprite_hist,state.sprite_hist.count-1));
   char*snapshot=malloc(sizeof(state.sprite_data));
   memcpy(snapshot,state.sprite_data,sizeof(state.sprite_data));
   octo_list_append(&state.sprite_hist,snapshot);
 }
-void edit_pixel_editor(){
+void edit_pixel_editor(void){
   state.sprite_hist_index++;
   while(state.sprite_hist.count>state.sprite_hist_index)free(octo_list_remove(&state.sprite_hist,state.sprite_hist.count-1));
   char*snapshot=malloc(sizeof(state.sprite_data));
   memcpy(snapshot,state.sprite_data,sizeof(state.sprite_data));
   octo_list_append(&state.sprite_hist,snapshot);
 }
-void undo_pixel_editor(){
+void undo_pixel_editor(void){
   if(state.sprite_hist_index<=0)return;
   state.sprite_hist_index--;
   memcpy(state.sprite_data,octo_list_get(&state.sprite_hist,state.sprite_hist_index),sizeof(state.sprite_data));
 }
-void redo_pixel_editor(){
+void redo_pixel_editor(void){
   if(state.sprite_hist_index>=state.sprite_hist.count-1)return;
   state.sprite_hist_index++;
   memcpy(state.sprite_data,octo_list_get(&state.sprite_hist,state.sprite_hist_index),sizeof(state.sprite_data));
@@ -1155,7 +1155,7 @@ int char_index(char*string,int line,int pos){
   }
   return 0;
 }
-char* export_text_from_pixel_editor(){
+char* export_text_from_pixel_editor(void){
   char pixels[64];
   int length=export_from_pixel_editor(pixels);
   octo_str text;       octo_str_init(&text);
@@ -1226,7 +1226,7 @@ void pixel_editor_shift(int dx, int dy){
   }
   edit_pixel_editor();
 }
-void render_pixel_editor(){
+void render_pixel_editor(void){
   // menu
   {
     rect mb={0,0,MENU_WIDTH,th/5};
@@ -1312,7 +1312,7 @@ void render_pixel_editor(){
 *
 **/
 
-void open_choose(){
+void open_choose(void){
   input.events[EVENT_ENTER]=0;
   if(state.open_items.count<1)return;
   octo_path_entry*entry=octo_list_get(&state.open_items,state.open_sel);
@@ -1382,7 +1382,7 @@ void open_choose(){
     snprintf(state.text_status,sizeof(state.text_status),"Opened octocart '%s'",entry->name);state.text_err=0;
   }
 }
-void save_choose(){
+void save_choose(void){
   if(state.open_items.count<1)return;
   octo_path_entry*entry=octo_list_get(&state.open_items,state.open_sel);
   if(entry->type==OCTO_FILE_TYPE_DIRECTORY){
@@ -1394,14 +1394,14 @@ void save_choose(){
     snprintf(state.open_name,sizeof(state.open_name),"%s",entry->name);
   }
 }
-void new_file(){
+void new_file(void){
   text_import(default_program);
   state.mode=MODE_TEXT_EDITOR;
   state.dirty=0;
   state.open_name[0]='\0';
   snprintf(state.text_status,sizeof(state.text_status),"Created a new project.");state.text_err=0;
 }
-void save_file(){
+void save_file(void){
   if(strlen(state.open_name)<1)return; // sanity check
   octo_name_set_extension(state.open_name,"gif");
   char filename[OCTO_PATH_MAX]="\0";
@@ -1553,7 +1553,7 @@ void render_open_save(int save){
 *
 **/
 
-void render(){
+void render(void){
   if     (state.mode==MODE_TEXT_EDITOR   )render_text_editor   ();
   else if(state.mode==MODE_CONFIG        )render_config        ();
   else if(state.mode==MODE_PALETTE_EDITOR)render_palette_editor();

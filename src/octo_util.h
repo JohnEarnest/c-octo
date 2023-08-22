@@ -505,7 +505,7 @@ void events_queue(SDL_Event*e){
     else if(e->wheel.x<0)input.events[EVENT_SCROLLLEFT ]=1;
   }
 }
-void events_clear(){
+void events_clear(void){
   for(int z=0;z<EVENT_MAX;z++)input.events[z]=0;
   if(input.double_click_timeout>0)input.double_click_timeout--;
 }
@@ -1033,7 +1033,7 @@ void emu_step(octo_emulator*emu,octo_program*prog){
   if(emu->st>0)emu->st--,emu->had_sound=1;
 }
 
-void random_init() {
+void random_init(void) {
   srand(time(NULL));
 }
 
