@@ -1,59 +1,96 @@
+# Ref: https://danyspin97.org/blog/makefiles-best-practices/
+#
+# People installing the regular way, unmanaged and into /usr/local, can leave
+# PREFIX and BINDIR at their default values.
+#
+# OS Packagers can set DESTDIR and PREFIX, and leave BINDIR alone.
+#
+# Folks using Stow or other link farm managers can override BINDIR alone, or
+# BINDIR and PREFIX.
 
-DESTDIR=""
-PREFIX="/usr/local"
+PREFIX ?= /usr/local
+BINDIR ?= ${PREFIX}/bin
+SDL_CONFIG ?= sdl2-config
+
 VERSION="1.2"
-INSTALLDIR=$(DESTDIR)$(PREFIX)/bin/
-SDL=$(shell sdl2-config --cflags --libs)
-UNAME=$(shell uname)
+UNAME := $(shell uname)
 
+# Any warning/error/info lines in the ifeq...endif block must not be indented,
+# otherwise GNU Make 4.4.1 will get upset (tab-newline is a rule)
 ifeq ($(UNAME),Darwin)
-	COMPILER=clang
-	FLAGS=-Wall -Werror -Wextra -Wpedantic
-endif
-ifeq ($(UNAME),Linux)
-	COMPILER=gcc
-	FLAGS=-std=c99 -lm -Wall -Werror -Wextra -Wno-format-truncation
-endif
-ifeq ($(findstring MINGW,$(UNAME)),MINGW)
-	COMPILER=gcc
-	FLAGS=-Wall -Werror -Wextra -Wno-format-truncation
+	CC ?= clang
+	CFLAGS := ${CFLAGS} -Wall -Werror -Wextra -Wpedantic
+	SDL_INCLUDE := $(shell ${SDL_CONFIG} --cflags)
+	SDL_LIBS := $(shell ${SDL_CONFIG} --libs)
+else ifeq ($(UNAME),Linux)
+	CC ?= gcc
+	CFLAGS := ${CFLAGS} -std=c99 -Wall -Werror -Wextra -Wno-format-truncation
+	LIBS := ${LIBS} -lm
+	SDL_INCLUDE := $(shell ${SDL_CONFIG} --cflags)
+	SDL_LIBS := $(shell ${SDL_CONFIG} --libs)
+else ifeq ($(findstring MINGW,$(UNAME)),MINGW)
+	CC ?= gcc
+	CFLAGS := ${CFLAGS} -Wall -Werror -Wextra -Wno-format-truncation
 	WINDOWS_SDL_PATH=C:/mingw_dev_lib
-	SDL=-I$(WINDOWS_SDL_PATH)/include/SDL2 -L$(WINDOWS_SDL_PATH)/lib -lmingw32 -lSDL2main -lSDL2
-endif
-ifndef COMPILER
-	$(error No configuration for host OS...)
+	SDL_INCLUDE := -I$(WINDOWS_SDL_PATH)/include/SDL2
+	SDL_LIBS=-L$(WINDOWS_SDL_PATH)/lib -lmingw32 -lSDL2main -lSDL2
+else
+$(warning No defaults for host OS "${UNAME}". Using generic fallbacks.)
+$(warning Set CC/SDL_INCLUDE/SDL_LIBS/CFLAGS/LIBS if the build fails.)
+	CC ?= gcc
+	CFLAGS := ${CFLAGS} -std=c99 -Wall -Werror -Wextra
+	SDL_INCLUDE := $(shell ${SDL_CONFIG} --cflags)
+	SDL_LIBS := $(shell ${SDL_CONFIG} --libs)
 endif
 
-all: cli run ide
+.PHONY: all build cli run ide clean \
+ install install_user_rc uninstall \
+ testcli testrun testregress
+
+all: build
+
+build: cli run ide
+
+cli: build/octo-cli
+run: build/octo-run
+ide: build/octo-de
 
 clean:
-	@rm -rf build/
+	@rm -rf build/ temp.ch temp.err
 
-cli:
-	@mkdir -p build
-	@$(COMPILER) src/octo_cli.c -o build/octo-cli $(FLAGS) -DVERSION="\"$(VERSION)\""
+build/octo-cli: src/octo_cli.c
+	@mkdir -p $(dir $@)
+	@${CC} $< -o $@ ${CFLAGS} ${LIBS} -DVERSION="\"${VERSION}\""
 
-run:
-	@mkdir -p build
-	@$(COMPILER) src/octo_run.c -o build/octo-run $(SDL) $(FLAGS) -DVERSION="\"$(VERSION)\""
+build/octo-run: src/octo_run.c
+	@mkdir -p $(dir $@)
+	@${CC} $< -o $@ ${SDL_INCLUDE} ${SDL_LIBS} ${CFLAGS} ${LIBS} \
+	    -DVERSION="\"${VERSION}\""
 
-ide:
-	@mkdir -p build
-	@$(COMPILER) src/octo_de.c -o build/octo-de $(SDL) $(FLAGS) -DVERSION="\"$(VERSION)\""
+build/octo-de: src/octo_de.c
+	@mkdir -p $(dir $@)
+	@${CC} $< -o $@ ${SDL_INCLUDE} ${SDL_LIBS} ${CFLAGS} ${LIBS} \
+	    -DVERSION="\"${VERSION}\""
 
-install:
-	@cp build/octo-cli $(INSTALLDIR)octo-cli
-	@cp build/octo-run $(INSTALLDIR)octo-run
-	@cp build/octo-de  $(INSTALLDIR)octo-de
+
+install: build
+	@cp build/octo-cli ${DESTDIR}${BINDIR}/octo-cli
+	@cp build/octo-run ${DESTDIR}${BINDIR}/octo-run
+	@cp build/octo-de  ${DESTDIR}${BINDIR}/octo-de
+	@echo 'Installed successfully in "${DESTDIR}${BINDIR}".'
+	@echo 'Consider copying ./octo.rc to ~/.octo.rc too.'
+	@echo 'Running "make install_user_rc" will do that for the current user.'
+
+install_user_rc:
 	@test -f ~/.octo.rc && echo "~/.octo.rc already exists." || true
 	@test -f ~/.octo.rc || ( echo "~/.octo.rc does not exist, creating." && cp -p octo.rc ~/.octo.rc )
-	@echo "installed successfully in $(INSTALLDIR)"
 
 uninstall:
-	@rm -f $(INSTALLDIR)octo-cli
-	@rm -f $(INSTALLDIR)octo-run
-	@rm -f $(INSTALLDIR)octo-de
-	@echo "uninstalled successfully."
+	@rm -f ${DESTDIR}${BINDIR}/octo-cli
+	@rm -f ${DESTDIR}${BINDIR}/octo-run
+	@rm -f ${DESTDIR}${BINDIR}/octo-de
+	@echo "Uninstalled successfully."
+
 
 testcli: cli
 	@./scripts/test_compiler.sh ./build/octo-cli
@@ -69,7 +106,7 @@ testrun: run
 testide: ide
 	./build/octo-de
 
-testregress: cli
+testregress:
 	@./scripts/test_compiler.sh ../Octo/octo
 	@rm -rf temp.ch8
 	@rm -rf temp.err
