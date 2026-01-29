@@ -679,6 +679,7 @@ double octo_calc_expr(octo_program*p,char*name){
 double octo_calculated(octo_program*p,char*name){
   octo_expect(p,"{");
   double r=octo_calc_expr(p,name);
+  if(!isfinite(r))r=0.0;
   octo_expect(p,"}");
   return r;
 }

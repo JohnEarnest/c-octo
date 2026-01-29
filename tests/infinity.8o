@@ -1,0 +1,6 @@
+# test behavior for inf/-inf/NaN calculation results
+
+: main
+	:byte {     1 / 0 } # should be "infinity"
+	:byte {    -1 / 0 } # should be "-infinity"
+	:byte { 1 * 1 / 0 } # should be "NaN"
